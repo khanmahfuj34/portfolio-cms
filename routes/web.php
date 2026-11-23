@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\SuperAdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PortfolioNavItemController;
 use App\Http\Controllers\Admin\PortfolioController;
+use App\Http\Controllers\PublicPortfolioController;
 
 // Application Root Redirect: if logged in as super admin, go to dashboard; else login
 Route::get('/', function () {
@@ -47,9 +48,31 @@ Route::middleware(['auth', 'super.admin'])
 
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
-        // Portfolio Management
+
+        // Profiles & Portfolios Management
+        Route::get('/profiles', [PortfolioController::class, 'index'])
+            ->name('profiles.index');
+
+        Route::get('/portfolios', [PortfolioController::class, 'index'])
+            ->name('portfolios.index');
+
+        Route::get('/portfolios/create', [PortfolioController::class, 'create'])
+            ->name('portfolios.create');
+
         Route::post('/portfolios', [PortfolioController::class, 'store'])
             ->name('portfolios.store');
+
+        Route::patch('/portfolios/{portfolio}/publish', [PortfolioController::class, 'publish'])
+            ->name('portfolios.publish')
+            ->whereNumber('portfolio');
+
+        Route::patch('/portfolios/{portfolio}/unpublish', [PortfolioController::class, 'unpublish'])
+            ->name('portfolios.unpublish')
+            ->whereNumber('portfolio');
+
+        Route::patch('/portfolios/{portfolio}/toggle-publish', [PortfolioController::class, 'togglePublish'])
+            ->name('portfolios.toggle-publish')
+            ->whereNumber('portfolio');
 
 
         // Portfolio Navbar Management
@@ -90,3 +113,14 @@ Route::middleware(['auth', 'super.admin'])
 
             });
     });
+
+// Public Portfolio Presentation (Resolved by globally unique slug)
+Route::get('/{slug}', [PublicPortfolioController::class, 'show'])
+    ->name('portfolio.show')
+    ->where('slug', '^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+// Public Portfolio Presentation (Resolved by globally unique slug)
+Route::get('/{slug}', [PublicPortfolioController::class, 'show'])
+    ->name('portfolio.show')
+    ->where('slug', '^[a-z0-9]+(?:-[a-z0-9]+)*$');

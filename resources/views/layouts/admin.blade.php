@@ -168,7 +168,7 @@
                     </x-admin.nav-link>
 
                     <!-- 2. Portfolios -->
-                    <x-admin.nav-link href="#portfolios" title="Portfolios" class="sidebar-link-item">
+                    <x-admin.nav-link :href="route('admin.portfolios.index')" :active="request()->routeIs('admin.portfolios.*')" title="Portfolios" class="sidebar-link-item">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                         </svg>
@@ -182,7 +182,7 @@
                     </x-admin.nav-link>
 
                     <!-- 4. Profiles -->
-                    <x-admin.nav-link href="#profiles" title="Profiles" class="sidebar-link-item">
+                    <x-admin.nav-link :href="route('admin.profiles.index')" :active="request()->routeIs('admin.profiles.*')" title="Profiles" class="sidebar-link-item">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
@@ -486,6 +486,30 @@
 
         <!-- Main Page Content Slot -->
         <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+            @if(session('success'))
+                <div id="flash-success-toast" class="mb-6 p-4 rounded-2xl bg-emerald-950/90 border border-emerald-500/40 text-emerald-100 shadow-xl flex items-center justify-between gap-3 animate-toast">
+                    <div class="flex items-center gap-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34D399]"></span>
+                        <span class="text-xs sm:text-sm font-semibold">{{ session('success') }}</span>
+                    </div>
+                    <button type="button" onclick="this.closest('#flash-success-toast').remove()" class="text-emerald-300 hover:text-white p-1" title="Close">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div id="flash-error-toast" class="mb-6 p-4 rounded-2xl bg-rose-950/90 border border-rose-500/40 text-rose-100 shadow-xl flex items-center justify-between gap-3 animate-toast">
+                    <div class="flex items-center gap-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-[0_0_8px_#F87171]"></span>
+                        <span class="text-xs sm:text-sm font-semibold">{{ session('error') }}</span>
+                    </div>
+                    <button type="button" onclick="this.closest('#flash-error-toast').remove()" class="text-rose-300 hover:text-white p-1" title="Close">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            @endif
+
             @yield('content')
         </main>
 

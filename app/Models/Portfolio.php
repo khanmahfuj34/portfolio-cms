@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use Illuminate\Database\Eloquent\Relations\HasOne;
 class Portfolio extends Model
 {
     protected $fillable = [
@@ -34,4 +34,8 @@ class Portfolio extends Model
         return $this->hasMany(PortfolioNavItem::class)
             ->orderBy('sort_order');
     }
-}
+    public function profile(): HasOne
+    {
+        return $this->hasOne(PortfolioProfile::class);
+    }
+    }

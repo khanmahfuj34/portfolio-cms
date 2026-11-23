@@ -10,13 +10,33 @@ use Illuminate\Validation\ValidationException;
 
 class PortfolioNavItemService
 {
+        
     /**
-     * Get all navigation items of a portfolio.
+     * Get all navigation items for Admin site.
      */
     public function getAll(Portfolio $portfolio): Collection
     {
-        return $portfolio->navItems()->get();
+        return $portfolio->navItems;
     }
+    
+    /**
+     * Get visible navigation items for public portfolio.
+     */
+    public function getPublicNavItems(Portfolio $portfolio): Collection
+    {
+        // Draft portfolios must not expose public navigation.
+        abort_unless(
+            $portfolio->status === 'published',
+            404
+        );
+
+        return $portfolio->navItems()
+            ->where('is_visible', true)
+            ->orderBy('sort_order')
+            ->get();
+    }
+
+
 
     /**
      * Create a new navigation item.
@@ -47,6 +67,20 @@ class PortfolioNavItemService
         $navItem = $portfolio->navItems()
             ->findOrFail($navItemId);
 
+        // Switch destination to internal section.
+        if (array_key_exists('section_key', $data)
+            && ! array_key_exists('url', $data)) {
+
+            $data['url'] = null;
+        }
+
+        // Switch destination to external URL.
+        if (array_key_exists('url', $data)
+            && ! array_key_exists('section_key', $data)) {
+
+            $data['section_key'] = null;
+        }
+
         $navItem->update($data);
 
         return $navItem->refresh();
@@ -67,36 +101,47 @@ class PortfolioNavItemService
     }
 
     /**
-     * Reorder all navigation items.
+     * Reorder all navigation items of a portfolio.
      */
     public function reorder(
         Portfolio $portfolio,
         array $itemIds
     ): void {
 
-        $existingIds = $portfolio->navItems()
-            ->pluck('id')
-            ->map(fn ($id) => (int) $id)
-            ->sort()
-            ->values()
-            ->all();
-
-        $submittedIds = collect($itemIds)
-            ->map(fn ($id) => (int) $id)
-            ->sort()
-            ->values()
-            ->all();
-
-        // Every existing item must be included exactly once.
-        if ($existingIds !== $submittedIds) {
-            throw ValidationException::withMessages([
-                'items' => 'Invalid navigation items submitted.',
-            ]);
-        }
-
         DB::transaction(function () use ($portfolio, $itemIds) {
+
+            // Lock the portfolio row to serialize reorder operations.
+            $lockedPortfolio = Portfolio::query()
+                ->whereKey($portfolio->getKey())
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Retrieve and lock all existing navigation items.
+            $existingIds = $lockedPortfolio->navItems()
+                ->lockForUpdate()
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->sort()
+                ->values()
+                ->all();
+
+            // Normalize submitted IDs.
+            $submittedIds = collect($itemIds)
+                ->map(fn ($id) => (int) $id)
+                ->sort()
+                ->values()
+                ->all();
+
+            // Ensure every existing item is submitted exactly once.
+            if ($existingIds !== $submittedIds) {
+                throw ValidationException::withMessages([
+                    'items' => 'Invalid navigation items. Please refresh and try again.',
+                ]);
+            }
+
+            // Assign consecutive sort positions.
             foreach ($itemIds as $position => $id) {
-                $portfolio->navItems()
+                $lockedPortfolio->navItems()
                     ->whereKey($id)
                     ->update([
                         'sort_order' => $position + 1,

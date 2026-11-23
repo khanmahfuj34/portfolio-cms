@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class StorePortfolioNavItemRequest extends FormRequest
 {
@@ -24,11 +25,13 @@ class StorePortfolioNavItemRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:80',
+                'regex:/^[a-z][a-z0-9_-]*$/',
             ],
 
             'url' => [
                 'nullable',
-                'url',
+                'string',
+                'url:http,https',
                 'max:255',
             ],
 
@@ -43,5 +46,20 @@ class StorePortfolioNavItemRequest extends FormRequest
                 'boolean',
             ],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $hasSection = filled($this->input('section_key'));
+            $hasUrl = filled($this->input('url'));
+
+            if ($hasSection === $hasUrl) {
+                $validator->errors()->add(
+                    'section_key',
+                    'Provide exactly one destination: section_key or url.'
+                );
+            }
+        });
     }
 }
