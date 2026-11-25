@@ -1,4 +1,5 @@
 import { initAnimations } from './landing/animations';
+import { initBenefitsMotion } from './landing/benefits-motion';
 import { initPortfolioShowcase } from './landing/portfolio-showcase';
 import { initCursorEffects } from './landing/cursor-effects';
 import { initInteractions } from './landing/interactions';
@@ -6,6 +7,7 @@ import { initInteractions } from './landing/interactions';
 function boot() {
     initInteractions();
     initAnimations();
+    initBenefitsMotion();
     initPortfolioShowcase();
     initCursorEffects();
 }
