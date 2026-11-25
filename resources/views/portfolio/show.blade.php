@@ -4,10 +4,10 @@
 
     {{-- Admin Preview Banner for Draft Portfolios --}}
     @if (!empty($isPreview) && $isPreview)
-        <div class="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 text-center text-xs font-semibold text-amber-300 flex items-center justify-center gap-2 relative z-50">
-            <span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span>
-            <span>Admin Preview Mode: This portfolio is currently in <strong>Draft</strong> status and only visible to you as Super Admin.</span>
-            <a href="{{ route('admin.profiles.index') }}" class="underline hover:text-amber-200 ml-2">Back to Dashboard</a>
+        <div class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-xs font-medium text-amber-300 flex items-center justify-center gap-2 relative z-50">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>Admin Preview Mode: This portfolio is currently in <strong>Draft</strong> and only visible to you as Super Admin.</span>
+            <a href="{{ route('admin.profiles.index') }}" class="underline hover:text-amber-100 ml-2">Back to dashboard</a>
         </div>
     @endif
 
@@ -20,21 +20,17 @@
     <main class="flex-1">
 
         {{-- Section: Home / Hero (#home) --}}
-        <section id="home" class="relative pt-20 pb-24 md:pt-32 md:pb-36 overflow-hidden">
-            <!-- Decorative Glow Accents -->
-            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-[#D4AF69]/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
-            <div class="absolute top-1/2 left-1/4 w-[300px] h-[300px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
-
-            <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+        <section id="home" class="relative pt-20 pb-20 md:pt-28 md:pb-32">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
                 
                 <!-- Status & Location Pill -->
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#141822] border border-[#1E2330] text-xs shadow-xs">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span class="text-slate-300 font-medium">Available for Opportunities</span>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#131720] border border-white/10 text-xs">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span class="text-slate-300 font-normal">Available for opportunities</span>
                     @if ($profile?->location)
                         <span class="text-slate-600">•</span>
                         <span class="text-slate-400 flex items-center gap-1">
-                            <svg class="w-3 h-3 text-[#D4AF69]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg class="w-3 h-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
@@ -44,12 +40,12 @@
                 </div>
 
                 <!-- Main Hero Headings -->
-                <div class="space-y-4 max-w-3xl mx-auto">
-                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-tight">
-                        Hi, I'm <span class="bg-gradient-to-r from-white via-slate-100 to-[#D4AF69] bg-clip-text text-transparent">{{ $profile?->full_name ?? $portfolio->name }}</span>
+                <div class="space-y-3 max-w-2xl mx-auto pt-2">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-white leading-tight">
+                        {{ $profile?->full_name ?? $portfolio->name }}
                     </h1>
                     @if ($profile?->professional_title)
-                        <p class="text-lg sm:text-xl md:text-2xl font-semibold text-[#D4AF69] tracking-normal">
+                        <p class="text-base sm:text-lg font-medium text-[#C5A059] tracking-normal">
                             {{ $profile->professional_title }}
                         </p>
                     @endif
@@ -57,20 +53,20 @@
 
                 <!-- Bio Summary -->
                 @if ($profile?->bio || $portfolio->description)
-                    <p class="max-w-2xl mx-auto text-sm sm:text-base text-slate-400 leading-relaxed">
+                    <p class="max-w-xl mx-auto text-sm sm:text-base text-slate-400 leading-relaxed font-normal">
                         {{ $profile?->bio ?? $portfolio->description }}
                     </p>
                 @endif
 
                 <!-- CTA Actions -->
-                <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-3">
                     @if ($profile?->email)
                         <a href="mailto:{{ $profile->email }}" 
-                           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#D4AF69] hover:bg-[#C9A25B] text-slate-950 font-bold text-xs tracking-wide transition-all shadow-md shadow-[#D4AF69]/20 hover:scale-[1.02]">
-                            <svg class="w-4 h-4 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#C5A059] hover:bg-[#B69149] text-[#0D0F14] font-semibold text-xs tracking-wide transition-colors">
+                            <svg class="w-3.5 h-3.5 text-[#0D0F14]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
-                            <span>Contact Me</span>
+                            <span>Contact</span>
                         </a>
                     @endif
 
@@ -79,9 +75,9 @@
                     @endphp
                     @if ($aboutItem)
                         <a href="#about" 
-                           class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#141822] hover:bg-[#1E2330] text-slate-200 border border-[#1E2330] hover:border-slate-700 font-semibold text-xs transition-all">
-                            <span>Learn More</span>
-                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                           class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-transparent hover:bg-white/5 text-slate-300 hover:text-white border border-white/10 font-medium text-xs transition-colors">
+                            <span>About</span>
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                             </svg>
                         </a>
@@ -92,41 +88,31 @@
         </section>
 
         {{-- Section: About (#about) --}}
-        <section id="about" class="py-20 md:py-28 border-t border-[#1E2330]/60 bg-[#0F1219]/40 relative">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        <section id="about" class="py-16 md:py-24 border-t border-white/10 bg-[#131720]/40">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                 
-                <div class="space-y-2 text-center md:text-left">
-                    <span class="text-xs font-bold tracking-widest text-[#D4AF69] uppercase">Profile Overview</span>
-                    <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">About Me</h2>
+                <div class="space-y-1">
+                    <p class="text-xs font-medium text-[#C5A059]">Profile overview</p>
+                    <h2 class="text-2xl font-semibold text-white tracking-tight">About</h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                     
                     <!-- Bio Details -->
-                    <div class="md:col-span-2 space-y-5 text-slate-300 text-sm leading-relaxed">
+                    <div class="md:col-span-2 space-y-4 text-slate-300 text-sm leading-relaxed">
                         @if ($profile?->bio)
-                            <div class="p-6 rounded-2xl bg-[#141822] border border-[#1E2330] shadow-xs space-y-4">
-                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-[#D4AF69]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    Biography
-                                </h3>
-                                <p class="text-slate-300 whitespace-pre-line leading-relaxed">
+                            <div class="p-6 rounded-xl bg-[#131720] border border-white/10 border-l-2 border-l-[#C5A059] space-y-3">
+                                <h3 class="text-xs font-medium text-slate-400">Background</h3>
+                                <p class="text-slate-200 whitespace-pre-line leading-relaxed font-normal">
                                     {{ $profile->bio }}
                                 </p>
                             </div>
                         @endif
 
                         @if ($portfolio->description)
-                            <div class="p-6 rounded-2xl bg-[#141822] border border-[#1E2330] shadow-xs space-y-3">
-                                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-[#D4AF69]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Portfolio Summary
-                                </h3>
-                                <p class="text-slate-400 leading-relaxed">
+                            <div class="p-6 rounded-xl bg-[#131720] border border-white/10 space-y-2">
+                                <h3 class="text-xs font-medium text-slate-400">Portfolio summary</h3>
+                                <p class="text-slate-300 leading-relaxed font-normal">
                                     {{ $portfolio->description }}
                                 </p>
                             </div>
@@ -134,45 +120,47 @@
                     </div>
 
                     <!-- Meta Information Card -->
-                    <div class="md:col-span-1 p-6 rounded-2xl bg-[#141822] border border-[#1E2330] shadow-xs space-y-5">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Information</h3>
+                    <div class="md:col-span-1 p-5 rounded-xl bg-[#131720] border border-white/10 space-y-4">
+                        <h3 class="text-xs font-medium text-slate-400">Details</h3>
                         
-                        <div class="space-y-4 text-xs">
+                        <dl class="space-y-3 text-xs">
                             @if ($profile?->full_name)
                                 <div>
-                                    <span class="block text-slate-500 font-medium">Full Name</span>
-                                    <span class="text-slate-200 font-semibold">{{ $profile->full_name }}</span>
+                                    <dt class="text-slate-500 font-normal">Name</dt>
+                                    <dd class="text-slate-200 font-medium mt-0.5">{{ $profile->full_name }}</dd>
                                 </div>
                             @endif
 
                             @if ($profile?->professional_title)
                                 <div>
-                                    <span class="block text-slate-500 font-medium">Title</span>
-                                    <span class="text-slate-200 font-semibold">{{ $profile->professional_title }}</span>
+                                    <dt class="text-slate-500 font-normal">Role</dt>
+                                    <dd class="text-slate-200 font-medium mt-0.5">{{ $profile->professional_title }}</dd>
                                 </div>
                             @endif
 
                             @if ($profile?->email)
                                 <div>
-                                    <span class="block text-slate-500 font-medium">Email</span>
-                                    <a href="mailto:{{ $profile->email }}" class="text-[#D4AF69] hover:underline font-medium break-all">
-                                        {{ $profile->email }}
-                                    </a>
+                                    <dt class="text-slate-500 font-normal">Email</dt>
+                                    <dd class="mt-0.5">
+                                        <a href="mailto:{{ $profile->email }}" class="text-[#C5A059] hover:text-[#E2C78E] transition-colors break-all">
+                                            {{ $profile->email }}
+                                        </a>
+                                    </dd>
                                 </div>
                             @endif
 
                             @if ($profile?->location)
                                 <div>
-                                    <span class="block text-slate-500 font-medium">Location</span>
-                                    <span class="text-slate-200 font-medium">{{ $profile->location }}</span>
+                                    <dt class="text-slate-500 font-normal">Location</dt>
+                                    <dd class="text-slate-200 font-medium mt-0.5">{{ $profile->location }}</dd>
                                 </div>
                             @endif
 
                             <div>
-                                <span class="block text-slate-500 font-medium">Portfolio ID</span>
-                                <span class="text-slate-400 font-mono text-[11px]">{{ $portfolio->slug }}</span>
+                                <dt class="text-slate-500 font-normal">Slug</dt>
+                                <dd class="text-slate-400 font-mono text-[11px] mt-0.5">{{ $portfolio->slug }}</dd>
                             </div>
-                        </div>
+                        </dl>
                     </div>
 
                 </div>
@@ -183,37 +171,79 @@
         {{-- Dynamic Anchors for configured sections (e.g. #projects, #skills, #contact) --}}
         @php
             $customSections = $navItems->filter(fn ($item) => $item->section_key && !in_array($item->section_key, ['home', 'about'], true));
+            $hasProjectsSection = $customSections->contains(fn ($item) => strtolower($item->section_key) === 'projects');
+            $hasSkillsSection = $customSections->contains(fn ($item) => strtolower($item->section_key) === 'skills');
+            $projectsCollection = $projects ?? collect();
+            $skillsCollection = $skills ?? collect();
         @endphp
 
         @foreach ($customSections as $sectionItem)
-            <section id="{{ $sectionItem->section_key }}" class="py-16 border-t border-[#1E2330]/60 relative">
-                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 text-center md:text-left">
-                    <div class="space-y-1">
-                        <span class="text-xs font-bold tracking-widest text-[#D4AF69] uppercase">Section</span>
-                        <h2 class="text-2xl font-bold text-white tracking-tight">{{ $sectionItem->label }}</h2>
-                    </div>
-                    <div class="p-8 rounded-2xl bg-[#141822] border border-[#1E2330] text-center space-y-3">
-                        <div class="w-12 h-12 mx-auto rounded-xl bg-[#D4AF69]/10 text-[#D4AF69] flex items-center justify-center">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
+            @php
+                $sectionKey = strtolower($sectionItem->section_key);
+            @endphp
+
+            @if ($sectionKey === 'projects')
+                @include('portfolio.partials.projects', [
+                    'projects' => $projectsCollection,
+                    'sectionTitle' => $sectionItem->label,
+                    'sectionId' => $sectionItem->section_key,
+                ])
+            @elseif ($sectionKey === 'skills')
+                @include('portfolio.partials.skills', [
+                    'skills' => $skillsCollection,
+                    'sectionTitle' => $sectionItem->label,
+                    'sectionId' => $sectionItem->section_key,
+                ])
+            @else
+                <section id="{{ $sectionItem->section_key }}" class="py-16 border-t border-white/10">
+                    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+                        <div class="space-y-1">
+                            <p class="text-xs font-medium text-[#C5A059]">Section</p>
+                            <h2 class="text-2xl font-semibold text-white tracking-tight">{{ $sectionItem->label }}</h2>
                         </div>
-                        <h3 class="text-base font-semibold text-white">{{ $sectionItem->label }}</h3>
-                        <p class="text-xs text-slate-400 max-w-md mx-auto">
-                            Content for this section is managed through the portfolio workspace.
-                        </p>
+                        <div class="p-6 rounded-xl bg-[#131720] border border-white/10 space-y-2">
+                            <h3 class="text-sm font-medium text-slate-200">{{ $sectionItem->label }}</h3>
+                            @if ($sectionKey === 'contact' && $profile?->email)
+                                <p class="text-xs text-slate-400 max-w-lg leading-relaxed">
+                                    Get in touch at
+                                    <a href="mailto:{{ $profile->email }}" class="text-[#C5A059] hover:text-[#E2C78E] transition-colors">
+                                        {{ $profile->email }}
+                                    </a>.
+                                </p>
+                            @else
+                                <p class="text-xs text-slate-400 max-w-lg leading-relaxed">
+                                    No additional items added to this section yet.
+                                </p>
+                            @endif
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            @endif
         @endforeach
+
+        @if (! $hasProjectsSection && $projectsCollection->isNotEmpty())
+            @include('portfolio.partials.projects', [
+                'projects' => $projectsCollection,
+                'sectionTitle' => 'Projects',
+                'sectionId' => 'projects',
+            ])
+        @endif
+
+        @if (! $hasSkillsSection && $skillsCollection->isNotEmpty())
+            @include('portfolio.partials.skills', [
+                'skills' => $skillsCollection,
+                'sectionTitle' => 'Skills',
+                'sectionId' => 'skills',
+            ])
+        @endif
 
     </main>
 
     {{-- Read-Only Public Footer --}}
-    <footer class="border-t border-[#1E2330] py-8 bg-[#0B0D12]">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-            <p>© {{ date('Y') }} {{ $profile?->full_name ?? $portfolio->name }}. All rights reserved.</p>
-            <p class="text-[11px] text-slate-600">Powered by Portfolio CMS</p>
+    <footer class="border-t border-white/10 py-6 bg-[#0D0F14]">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+            <p>© {{ date('Y') }} {{ $profile?->full_name ?? $portfolio->name }}</p>
+            <p class="text-[11px] text-slate-600">Portfolio CMS</p>
         </div>
     </footer>
 

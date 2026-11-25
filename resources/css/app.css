@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './admin.css';
+@import './admin/portfolios.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -7,6 +8,22 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Arimo', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Urbanist', ui-sans-serif, system-ui, sans-serif;
+
+    /* Paper / ink ramp */
+    --color-paper: #F6F5F1;
+    --color-paper-sunk: #EFEDE6;
+    --color-surface: #FFFFFF;
+    --color-ink: #211F1B;
+    --color-ink-soft: #57534B;
+    --color-ink-mute: #8B877E;
+    --color-line: #E6E3DB;
+    --color-line-strong: #D8D4C9;
+
+    /* Brass accent */
+    --color-brass: #C5A059;
+    --color-brass-ink: #6F5219;
+    --color-brass-wash: #F3ECDD;
 }

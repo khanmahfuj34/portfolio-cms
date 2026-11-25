@@ -6,52 +6,54 @@
 @section('content')
 <div class="space-y-6">
 
-    <!-- Header Section with Breadcrumb and Action Buttons -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
-        <div>
-            <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
-                <a href="{{ route('admin.dashboard') }}" class="hover:text-slate-800 transition-colors">Admin</a>
-                <span>/</span>
-                <a href="{{ route('admin.profiles.index') }}" class="hover:text-slate-800 transition-colors">Profiles</a>
-                <span>/</span>
-                <span class="text-slate-600 font-medium truncate max-w-[150px] sm:max-w-xs">{{ $portfolio->name }}</span>
-                <span>/</span>
-                <span class="font-semibold text-slate-800">Navigation</span>
+    <!-- Header -->
+    <section class="pb-5 border-b border-line">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div class="space-y-1.5">
+                <div class="flex items-center gap-2 text-[11px] text-ink-mute flex-wrap">
+                    <a href="{{ route('admin.dashboard') }}" class="hover:text-ink transition-colors">Admin</a>
+                    <span class="text-line-strong">/</span>
+                    <a href="{{ route('admin.profiles.index') }}" class="hover:text-ink transition-colors">Profiles</a>
+                    <span class="text-line-strong">/</span>
+                    <span class="text-ink-soft truncate max-w-[150px] sm:max-w-xs">{{ $portfolio->name }}</span>
+                    <span class="text-line-strong">/</span>
+                    <span class="text-ink-soft">Navigation</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <h2 class="font-display text-3xl leading-none text-ink">Navigation Management</h2>
+                    <x-admin.status-badge :status="$portfolio->status" />
+                </div>
+                <p class="max-w-2xl text-sm text-ink-soft">
+                    Navbar links, section anchors, external URLs, order and visibility for <span class="font-medium text-ink">{{ $portfolio->name }}</span>.
+                </p>
             </div>
-            <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2.5">
-                <span>Navigation Management</span>
-                <x-admin.status-badge :status="$portfolio->status" />
-            </h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Configure navbar links, internal section anchors, custom external URLs, sort order, and visibility for <strong>{{ $portfolio->name }}</strong>.
-            </p>
-        </div>
 
-        <div class="flex items-center gap-2.5 flex-shrink-0">
-            <a href="{{ route('admin.profiles.index') }}" 
-               class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 shadow-xs transition-colors inline-flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                </svg>
-                <span>Back to Profiles</span>
-            </a>
-            <a href="{{ url('/' . $portfolio->slug) }}" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               class="gold-btn-gradient inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-[#0B0D12] transition-transform active:scale-95 shadow-xs">
-                <svg class="w-4 h-4 text-[#0B0D12]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-                <span>Live Preview</span>
-            </a>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="{{ route('admin.profiles.index') }}"
+                   class="px-3.5 py-2 rounded-lg text-xs font-medium text-ink-soft bg-surface border border-line hover:bg-paper-sunk transition-colors inline-flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-ink-mute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    <span>Back</span>
+                </a>
+                <a href="{{ url('/' . $portfolio->slug) }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium bg-brass text-[#14130F] hover:bg-[#B89149] transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    <span>Preview</span>
+                </a>
+            </div>
         </div>
-    </div>
+    </section>
 
     @if (isset($errors) && $errors->any())
-        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs">
-            <div class="font-bold mb-1">Please fix the following navigation errors:</div>
-            <ul class="list-disc list-inside space-y-0.5">
+        <div class="p-4 rounded-lg bg-[#FBF1EF] border border-[#E9D2CC] border-l-2 border-l-[#B4553F] text-xs">
+            <div class="font-medium text-[#9C4A3E] mb-1">Please fix the following navigation errors.</div>
+            <ul class="list-disc list-inside space-y-0.5 text-ink-soft">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -61,232 +63,220 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Left Column: Add New Navigation Link (4 cols on lg) -->
+        <!-- Add link -->
         <div class="lg:col-span-4">
-            <div class="rounded-2xl bg-white border border-slate-200/80 p-5 shadow-sm sticky top-6">
-                <div class="flex items-center gap-2 pb-3 mb-4 border-b border-slate-100">
-                    <div class="w-7 h-7 rounded-lg bg-[#D4AF69]/20 text-[#9A7326] flex items-center justify-center font-bold text-xs">
-                        +
+            <div class="rounded-xl bg-surface border border-line p-5 lg:sticky lg:top-6">
+                <div class="flex items-center gap-2.5 pb-3 mb-4 border-b border-line">
+                    <div class="w-7 h-7 rounded-md bg-brass-wash text-brass-ink flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
                     </div>
                     <div>
-                        <h2 class="text-sm font-bold text-slate-900">Add Navigation Link</h2>
-                        <p class="text-[11px] text-slate-400">Append a new link to the navbar</p>
+                        <h3 class="text-sm font-medium text-ink">Add link</h3>
+                        <p class="text-[11px] text-ink-mute">Append to the navbar</p>
                     </div>
                 </div>
 
                 <form method="POST" action="{{ route('admin.portfolios.nav-items.store', $portfolio) }}" class="space-y-4">
                     @csrf
 
-                    <!-- Label -->
                     <div>
-                        <label for="new_item_label" class="block text-xs font-semibold text-slate-700 mb-1">
-                            Link Label <span class="text-rose-500">*</span>
+                        <label for="new_item_label" class="block text-[11px] font-medium text-ink-soft mb-1">
+                            Link label <span class="text-brass-ink">*</span>
                         </label>
-                        <input type="text" 
-                               id="new_item_label" 
-                               name="label" 
-                               value="{{ old('label') }}" 
-                               required 
+                        <input type="text"
+                               id="new_item_label"
+                               name="label"
+                               value="{{ old('label') }}"
+                               required
                                maxlength="80"
-                               placeholder="e.g. About, Projects, Contact" 
-                               class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#D4AF69]/40 focus:border-[#D4AF69] transition-all placeholder:text-slate-400"
+                               placeholder="About, Projects, Contact"
+                               class="w-full px-3 py-2 text-xs bg-surface text-ink placeholder-ink-mute border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors"
                         >
                     </div>
 
-                    <!-- Destination Type Switcher -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">
-                            Destination Type <span class="text-rose-500">*</span>
+                        <label class="block text-[11px] font-medium text-ink-soft mb-1.5">
+                            Destination type <span class="text-brass-ink">*</span>
                         </label>
-                        <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl text-xs font-semibold">
-                            <button type="button" 
+                        <div class="grid grid-cols-2 gap-1 p-1 bg-paper-sunk rounded-lg text-xs font-medium">
+                            <button type="button"
                                     id="type_btn_section"
-                                    onclick="switchNewItemType('section')" 
-                                    class="py-1.5 px-3 rounded-lg text-center transition-colors bg-white text-slate-900 shadow-xs">
-                                Section Anchor
+                                    onclick="switchNewItemType('section')"
+                                    class="py-1.5 px-3 rounded-md text-center transition-colors bg-surface text-ink shadow-xs">
+                                Section anchor
                             </button>
-                            <button type="button" 
+                            <button type="button"
                                     id="type_btn_url"
-                                    onclick="switchNewItemType('url')" 
-                                    class="py-1.5 px-3 rounded-lg text-center transition-colors text-slate-500 hover:text-slate-800">
+                                    onclick="switchNewItemType('url')"
+                                    class="py-1.5 px-3 rounded-md text-center transition-colors text-ink-soft hover:text-ink">
                                 External URL
                             </button>
                         </div>
                     </div>
 
-                    <!-- Section Key Input Container -->
                     <div id="section_key_container">
-                        <label for="new_item_section_key" class="block text-xs font-semibold text-slate-700 mb-1">
-                            Section Key <span class="text-rose-500">*</span>
+                        <label for="new_item_section_key" class="block text-[11px] font-medium text-ink-soft mb-1">
+                            Section key <span class="text-brass-ink">*</span>
                         </label>
                         <div class="relative">
-                            <span class="absolute left-3 top-2 text-slate-400 font-mono text-xs">#</span>
-                            <input type="text" 
-                                   id="new_item_section_key" 
-                                   name="section_key" 
-                                   value="{{ old('section_key', 'about') }}" 
-                                   placeholder="e.g. about, projects, contact"
+                            <span class="absolute left-3 top-2 text-brass-ink font-mono text-xs">#</span>
+                            <input type="text"
+                                   id="new_item_section_key"
+                                   name="section_key"
+                                   value="{{ old('section_key', 'about') }}"
+                                   placeholder="about, projects, contact"
                                    pattern="^[a-z][a-z0-9_-]*$"
-                                   class="w-full pl-7 pr-3 py-2 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#D4AF69]/40 focus:border-[#D4AF69] transition-all placeholder:text-slate-400"
+                                   class="w-full pl-7 pr-3 py-2 text-xs font-mono bg-surface text-ink placeholder-ink-mute border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors"
                             >
                         </div>
-                        <p class="text-[10px] text-slate-400 mt-1">Lowercase letters, numbers, dashes, underscores. e.g. <code>about</code>, <code>projects</code></p>
+                        <p class="text-[10px] text-ink-mute mt-1">Lowercase letters, numbers, dashes, underscores.</p>
                     </div>
 
-                    <!-- Custom URL Container (Hidden by default) -->
                     <div id="url_container" class="hidden">
-                        <label for="new_item_url" class="block text-xs font-semibold text-slate-700 mb-1">
-                            External URL <span class="text-rose-500">*</span>
+                        <label for="new_item_url" class="block text-[11px] font-medium text-ink-soft mb-1">
+                            External URL <span class="text-brass-ink">*</span>
                         </label>
-                        <input type="url" 
-                               id="new_item_url" 
-                               name="url" 
-                               value="{{ old('url') }}" 
-                               placeholder="https://example.com/resume.pdf" 
-                               class="w-full px-3 py-2 text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-[#D4AF69]/40 focus:border-[#D4AF69] transition-all placeholder:text-slate-400"
+                        <input type="url"
+                               id="new_item_url"
+                               name="url"
+                               value="{{ old('url') }}"
+                               placeholder="https://example.com/resume.pdf"
+                               class="w-full px-3 py-2 text-xs font-mono bg-surface text-ink placeholder-ink-mute border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors"
                         >
-                        <p class="text-[10px] text-slate-400 mt-1">Full URL starting with <code>http://</code> or <code>https://</code></p>
+                        <p class="text-[10px] text-ink-mute mt-1">Full URL starting with <code>http://</code> or <code>https://</code>.</p>
                     </div>
 
-                    <!-- Visibility Checkbox -->
                     <div class="flex items-center gap-2 pt-1">
-                        <input type="checkbox" 
-                               id="new_item_visible" 
-                               name="is_visible" 
-                               value="1" 
+                        <input type="checkbox"
+                               id="new_item_visible"
+                               name="is_visible"
+                               value="1"
                                {{ old('is_visible', '1') ? 'checked' : '' }}
-                               class="w-4 h-4 rounded text-[#9A7326] border-slate-300 focus:ring-[#D4AF69]/40"
+                               class="w-3.5 h-3.5 rounded border-line text-brass-ink focus:ring-brass/30"
                         >
-                        <label for="new_item_visible" class="text-xs font-medium text-slate-700 select-none">
-                            Make link visible on public portfolio
+                        <label for="new_item_visible" class="text-xs text-ink-soft select-none">
+                            Visible on the public portfolio
                         </label>
                     </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" 
-                            class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#0F1219] hover:bg-[#1E2330] active:scale-98 transition-all shadow-xs flex items-center justify-center gap-1.5">
-                        <svg class="w-4 h-4 text-[#D4AF69]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <button type="submit"
+                            class="w-full py-2.5 px-4 rounded-lg text-xs font-medium text-paper bg-[#14130F] hover:bg-[#2A261C] transition-colors flex items-center justify-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-brass" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                         </svg>
-                        <span>Add Link</span>
+                        <span>Add link</span>
                     </button>
                 </form>
 
-                <!-- Section Reference Helper -->
-                <div class="mt-6 pt-4 border-t border-slate-100">
-                    <p class="text-[11px] font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Suggested Section Keys</p>
+                <div class="mt-6 pt-4 border-t border-line">
+                    <p class="text-[11px] font-medium text-ink-soft mb-2">Suggested section keys</p>
                     <div class="flex flex-wrap gap-1.5 text-[10px] font-mono">
-                        <button type="button" onclick="setSectionKey('home', 'Home')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">#home</button>
-                        <button type="button" onclick="setSectionKey('about', 'About')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">#about</button>
-                        <button type="button" onclick="setSectionKey('projects', 'Projects')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">#projects</button>
-                        <button type="button" onclick="setSectionKey('skills', 'Skills')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">#skills</button>
-                        <button type="button" onclick="setSectionKey('experience', 'Experience')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">#experience</button>
-                        <button type="button" onclick="setSectionKey('contact', 'Contact')" class="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">#contact</button>
+                        <button type="button" onclick="setSectionKey('home', 'Home')" class="px-2 py-0.5 rounded bg-paper hover:bg-paper-sunk text-ink-soft border border-line transition-colors">#home</button>
+                        <button type="button" onclick="setSectionKey('about', 'About')" class="px-2 py-0.5 rounded bg-paper hover:bg-paper-sunk text-ink-soft border border-line transition-colors">#about</button>
+                        <button type="button" onclick="setSectionKey('projects', 'Projects')" class="px-2 py-0.5 rounded bg-paper hover:bg-paper-sunk text-ink-soft border border-line transition-colors">#projects</button>
+                        <button type="button" onclick="setSectionKey('skills', 'Skills')" class="px-2 py-0.5 rounded bg-paper hover:bg-paper-sunk text-ink-soft border border-line transition-colors">#skills</button>
+                        <button type="button" onclick="setSectionKey('experience', 'Experience')" class="px-2 py-0.5 rounded bg-paper hover:bg-paper-sunk text-ink-soft border border-line transition-colors">#experience</button>
+                        <button type="button" onclick="setSectionKey('contact', 'Contact')" class="px-2 py-0.5 rounded bg-paper hover:bg-paper-sunk text-ink-soft border border-line transition-colors">#contact</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: Navigation Links Table (8 cols on lg) -->
+        <!-- Current links -->
         <div class="lg:col-span-8">
-            <div class="rounded-2xl bg-white border border-slate-200/80 shadow-sm overflow-hidden">
-                <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+            <div class="rounded-xl bg-surface border border-line overflow-hidden">
+                <div class="p-4 sm:p-5 border-b border-line flex items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-sm font-bold text-slate-900">Current Navbar Links</h2>
-                        <p class="text-xs text-slate-500 mt-0.5">
-                            {{ $navItems->count() }} of maximum 10 navigation items configured
+                        <h3 class="text-sm font-medium text-ink">Current links</h3>
+                        <p class="text-xs text-ink-mute mt-0.5">
+                            <span class="tabular">{{ $navItems->count() }}</span> of 10 configured
                         </p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $navItems->count() > 0 ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
-                        {{ $navItems->count() }} Item(s)
+                    <span class="inline-flex items-center gap-1.5 text-[11px] text-ink-soft">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $navItems->count() > 0 ? 'bg-brass' : 'bg-line-strong' }}"></span>
+                        <span class="tabular">{{ $navItems->count() }}</span>
                     </span>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="border-b border-slate-100 bg-slate-50/70 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                                <th scope="col" class="py-3.5 pl-5 pr-3 w-16">Order</th>
-                                <th scope="col" class="py-3.5 px-3">Label</th>
-                                <th scope="col" class="py-3.5 px-3">Destination</th>
-                                <th scope="col" class="py-3.5 px-3">Visibility</th>
-                                <th scope="col" class="py-3.5 pl-3 pr-5 text-right">Actions</th>
+                            <tr class="border-b border-line text-[11px] font-medium text-ink-mute">
+                                <th scope="col" class="py-3 pl-5 pr-3 w-16">Order</th>
+                                <th scope="col" class="py-3 px-3">Label</th>
+                                <th scope="col" class="py-3 px-3">Destination</th>
+                                <th scope="col" class="py-3 px-3">Visibility</th>
+                                <th scope="col" class="py-3 pl-3 pr-5 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 font-medium">
+                        <tbody class="divide-y divide-line">
                             @forelse($navItems as $item)
-                                <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <!-- Sort Order -->
-                                    <td class="py-3.5 pl-5 pr-3">
-                                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-mono font-bold text-xs flex items-center justify-center border border-slate-200">
+                                <tr class="hover:bg-paper transition-colors">
+                                    <td class="py-3 pl-5 pr-3">
+                                        <span class="w-6 h-6 rounded bg-paper text-ink-soft font-mono text-[11px] flex items-center justify-center border border-line tabular">
                                             {{ $item->sort_order }}
                                         </span>
                                     </td>
 
-                                    <!-- Label -->
-                                    <td class="py-3.5 px-3">
+                                    <td class="py-3 px-3">
                                         <div class="flex items-center gap-2">
-                                            <span class="font-bold text-slate-900">{{ $item->label }}</span>
+                                            <span class="font-medium text-ink">{{ $item->label }}</span>
                                             @if($item->section_key === 'home')
-                                                <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#D4AF69]/20 text-[#9A7326] border border-[#D4AF69]/30">
+                                                <span class="px-1.5 py-0.5 rounded bg-brass-wash text-brass-ink text-[10px] font-medium">
                                                     Default
                                                 </span>
                                             @endif
                                         </div>
                                     </td>
 
-                                    <!-- Destination -->
-                                    <td class="py-3.5 px-3">
+                                    <td class="py-3 px-3">
                                         @if($item->section_key)
-                                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 font-mono text-[11px] border border-indigo-200/60">
-                                                <span>#</span>{{ $item->section_key }}
+                                            <span class="inline-flex items-center gap-0.5 font-mono text-[11px] text-ink-soft">
+                                                <span class="text-brass-ink">#</span>{{ $item->section_key }}
                                             </span>
                                         @elseif($item->url)
-                                            <a href="{{ $item->url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[11px] border border-slate-200 transition-colors max-w-[200px] truncate" title="{{ $item->url }}">
+                                            <a href="{{ $item->url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 font-mono text-[11px] text-ink-mute hover:text-brass-ink transition-colors max-w-[200px] truncate" title="{{ $item->url }}">
                                                 <span class="truncate">{{ $item->url }}</span>
-                                                <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                                <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                             </a>
                                         @else
-                                            <span class="text-slate-400 italic">None</span>
+                                            <span class="text-ink-mute italic">None</span>
                                         @endif
                                     </td>
 
-                                    <!-- Visibility Toggle -->
-                                    <td class="py-3.5 px-3">
+                                    <td class="py-3 px-3">
                                         <form method="POST" action="{{ route('admin.portfolios.nav-items.visibility', [$portfolio, $item->id]) }}">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" 
-                                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors {{ $item->is_visible ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200' }}"
-                                                    title="Click to toggle visibility">
-                                                <span class="w-1.5 h-1.5 rounded-full {{ $item->is_visible ? 'bg-emerald-500' : 'bg-slate-400' }}"></span>
+                                            <button type="submit"
+                                                    class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium border transition-colors {{ $item->is_visible ? 'bg-[#EEF3EC] text-[#3F5A38] border-[#DAE4D5] hover:bg-[#E4EDDF]' : 'bg-paper text-ink-mute border-line hover:bg-paper-sunk' }}"
+                                                    title="Toggle visibility">
+                                                <span class="w-1.5 h-1.5 rounded-full {{ $item->is_visible ? 'bg-[#5B7A4B]' : 'bg-ink-mute' }}"></span>
                                                 <span>{{ $item->is_visible ? 'Visible' : 'Hidden' }}</span>
                                             </button>
                                         </form>
                                     </td>
 
-                                    <!-- Actions -->
-                                    <td class="py-3.5 pl-3 pr-5 text-right relative">
+                                    <td class="py-3 pl-3 pr-5 text-right relative">
                                         <div class="inline-flex items-center gap-1">
-                                            <!-- Edit Toggle Button -->
-                                            <button type="button" 
-                                                    onclick="toggleEditRow({{ $item->id }})" 
-                                                    class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                                                    title="Edit Item">
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <button type="button"
+                                                    onclick="toggleEditRow({{ $item->id }})"
+                                                    class="p-1.5 text-ink-mute hover:text-ink hover:bg-paper-sunk rounded-md transition-colors"
+                                                    title="Edit item">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                                 </svg>
                                             </button>
 
-                                            <!-- Delete Button -->
                                             <form method="POST" action="{{ route('admin.portfolios.nav-items.destroy', [$portfolio, $item->id]) }}" onsubmit="return confirm('Delete navigation link \'{{ $item->label }}\'?');">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" 
-                                                        class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                                                        title="Delete Item">
-                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <button type="submit"
+                                                        class="p-1.5 text-ink-mute hover:text-[#9C4A3E] hover:bg-[#F7ECE9] rounded-md transition-colors"
+                                                        title="Delete item">
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                     </svg>
                                                 </button>
@@ -295,8 +285,7 @@
                                     </td>
                                 </tr>
 
-                                <!-- Inline Edit Row (Hidden by default) -->
-                                <tr id="edit_row_{{ $item->id }}" class="hidden bg-slate-50/90 border-t border-b border-[#D4AF69]/30">
+                                <tr id="edit_row_{{ $item->id }}" class="hidden bg-paper-sunk border-t border-b border-brass/30">
                                     <td colspan="5" class="p-4">
                                         <form method="POST" action="{{ route('admin.portfolios.nav-items.update', [$portfolio, $item->id]) }}" class="space-y-3">
                                             @csrf
@@ -304,29 +293,29 @@
 
                                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                                 <div>
-                                                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">Label</label>
-                                                    <input type="text" name="label" value="{{ $item->label }}" required maxlength="80" class="w-full px-2.5 py-1.5 text-xs bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#D4AF69]/40">
+                                                    <label class="block text-[11px] font-medium text-ink-soft mb-1">Label</label>
+                                                    <input type="text" name="label" value="{{ $item->label }}" required maxlength="80" class="w-full px-2.5 py-1.5 text-xs bg-surface text-ink border border-line rounded-md focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20">
                                                 </div>
 
                                                 <div>
-                                                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">Section Key (#)</label>
-                                                    <input type="text" name="section_key" value="{{ $item->section_key }}" placeholder="e.g. about" class="w-full px-2.5 py-1.5 text-xs font-mono bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#D4AF69]/40">
+                                                    <label class="block text-[11px] font-medium text-ink-soft mb-1">Section key (#)</label>
+                                                    <input type="text" name="section_key" value="{{ $item->section_key }}" placeholder="about" class="w-full px-2.5 py-1.5 text-xs font-mono bg-surface text-ink border border-line rounded-md focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20">
                                                 </div>
 
                                                 <div>
-                                                    <label class="block text-[11px] font-semibold text-slate-700 mb-1">External URL</label>
-                                                    <input type="url" name="url" value="{{ $item->url }}" placeholder="https://..." class="w-full px-2.5 py-1.5 text-xs font-mono bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-[#D4AF69]/40">
+                                                    <label class="block text-[11px] font-medium text-ink-soft mb-1">External URL</label>
+                                                    <input type="url" name="url" value="{{ $item->url }}" placeholder="https://" class="w-full px-2.5 py-1.5 text-xs font-mono bg-surface text-ink border border-line rounded-md focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20">
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center justify-between pt-1">
-                                                <p class="text-[10px] text-slate-400">Specify exactly one destination: Section Key or External URL.</p>
-                                                <div class="flex items-center gap-2">
-                                                    <button type="button" onclick="toggleEditRow({{ $item->id }})" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 transition-colors">
+                                            <div class="flex items-center justify-between pt-1 gap-3">
+                                                <p class="text-[10px] text-ink-mute">Specify one destination: section key or external URL.</p>
+                                                <div class="flex items-center gap-2 flex-shrink-0">
+                                                    <button type="button" onclick="toggleEditRow({{ $item->id }})" class="px-3 py-1 rounded-md text-xs font-medium text-ink-soft bg-surface border border-line hover:bg-paper transition-colors">
                                                         Cancel
                                                     </button>
-                                                    <button type="submit" class="px-3 py-1 rounded-lg text-xs font-bold text-white bg-[#0F1219] hover:bg-[#1E2330] transition-colors">
-                                                        Save Changes
+                                                    <button type="submit" class="px-3 py-1 rounded-md text-xs font-medium text-paper bg-[#14130F] hover:bg-[#2A261C] transition-colors">
+                                                        Save changes
                                                     </button>
                                                 </div>
                                             </div>
@@ -337,14 +326,14 @@
                                 <tr>
                                     <td colspan="5" class="py-10 px-6 text-center">
                                         <div class="max-w-xs mx-auto flex flex-col items-center">
-                                            <div class="w-10 h-10 rounded-xl bg-amber-50 border border-[#D4AF69]/20 flex items-center justify-center text-[#9A7326] mb-2">
-                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                            <div class="w-10 h-10 rounded-md bg-paper border border-line flex items-center justify-center text-ink-mute mb-2">
+                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/>
                                                 </svg>
                                             </div>
-                                            <h4 class="text-xs font-bold text-slate-900 mb-0.5">No navigation items configured</h4>
-                                            <p class="text-[11px] text-slate-500">
-                                                Add your first navigation link using the form on the left.
+                                            <h4 class="text-xs font-medium text-ink mb-0.5">No navigation items</h4>
+                                            <p class="text-[11px] text-ink-mute">
+                                                Add the first link using the form on the left.
                                             </p>
                                         </div>
                                     </td>
@@ -369,15 +358,18 @@
         const secInput = document.getElementById('new_item_section_key');
         const urlInput = document.getElementById('new_item_url');
 
+        const activeClass = 'py-1.5 px-3 rounded-md text-center transition-colors bg-surface text-ink shadow-xs';
+        const inactiveClass = 'py-1.5 px-3 rounded-md text-center transition-colors text-ink-soft hover:text-ink';
+
         if (type === 'section') {
-            btnSection.className = 'py-1.5 px-3 rounded-lg text-center transition-colors bg-white text-slate-900 shadow-xs';
-            btnUrl.className = 'py-1.5 px-3 rounded-lg text-center transition-colors text-slate-500 hover:text-slate-800';
+            btnSection.className = activeClass;
+            btnUrl.className = inactiveClass;
             secContainer.classList.remove('hidden');
             urlContainer.classList.add('hidden');
             urlInput.value = '';
         } else {
-            btnUrl.className = 'py-1.5 px-3 rounded-lg text-center transition-colors bg-white text-slate-900 shadow-xs';
-            btnSection.className = 'py-1.5 px-3 rounded-lg text-center transition-colors text-slate-500 hover:text-slate-800';
+            btnUrl.className = activeClass;
+            btnSection.className = inactiveClass;
             urlContainer.classList.remove('hidden');
             secContainer.classList.add('hidden');
             secInput.value = '';

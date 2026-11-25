@@ -1,76 +1,62 @@
-<div class="rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-6 relative overflow-hidden group">
-    <!-- Subtle Ambient Top-Right Accent -->
-    <div class="absolute -top-12 -right-12 w-32 h-32 bg-[#D4AF69]/5 rounded-full blur-2xl group-hover:bg-[#D4AF69]/10 transition-all duration-500 pointer-events-none" aria-hidden="true"></div>
+<div class="rounded-xl bg-surface border border-line p-6 sm:p-7 space-y-6">
 
-    <!-- Section Header -->
-    <div class="flex items-start gap-4 pb-5 border-b border-slate-100">
-        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#0F1219] to-[#252C3C] text-[#D4AF69] flex items-center justify-center flex-shrink-0 border border-[#D4AF69]/30 shadow-xs">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <!-- Section header -->
+    <div class="flex items-start gap-3 pb-5 border-b border-line">
+        <div class="w-9 h-9 rounded-md bg-brass-wash text-brass-ink flex items-center justify-center flex-shrink-0">
+            <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
             </svg>
         </div>
         <div class="min-w-0">
-            <h3 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                <span>Portfolio Information</span>
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#D4AF69]/15 text-[#9A7326] border border-[#D4AF69]/25">
-                    Core Site
-                </span>
-            </h3>
-            <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                Configure primary identity and web address routing for this portfolio profile.
+            <h3 class="text-sm font-medium text-ink">Portfolio Information</h3>
+            <p class="text-xs text-ink-mute mt-0.5 leading-relaxed">
+                Primary identity and web address for this portfolio.
             </p>
         </div>
     </div>
 
-    <!-- Fields Grid -->
     <div class="space-y-5">
-        <!-- 1. Portfolio Name -->
-        <x-admin.form.input 
-            label="Portfolio Name" 
-            name="name" 
+        <x-admin.form.input
+            label="Portfolio name"
+            name="name"
             id="portfolio-name-input"
-            placeholder="e.g. Minimalist Architecture & Design Studio" 
-            :required="true" 
-            helper="Enter a descriptive public title for this portfolio showcase."
+            placeholder="Studio name or showcase title"
+            :required="true"
+            helper="The public title shown for this portfolio."
         />
 
-        <!-- 2. Portfolio Slug & Live URL Preview -->
         <div class="space-y-2">
-            <x-admin.form.input 
-                label="Portfolio Slug" 
-                name="slug" 
+            <x-admin.form.input
+                label="Portfolio slug"
+                name="slug"
                 id="portfolio-slug-input"
-                placeholder="e.g. minimalist-architecture" 
-                :required="true" 
-                helper="The unique URL identifier used to access this portfolio. Only lowercase letters, numbers, and hyphens."
+                placeholder="minimalist-architecture"
+                :required="true"
+                helper="Lowercase letters, numbers, and hyphens only."
             />
 
-            <!-- Live URL Preview Box -->
-            <div class="p-3 rounded-xl bg-slate-900 text-slate-300 border border-slate-800 text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 shadow-xs">
+            <!-- URL preview -->
+            <div class="p-3 rounded-lg bg-paper-sunk border border-line text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
                 <div class="flex items-center gap-2 min-w-0">
-                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#D4AF69]/15 text-[#E8C98E] text-[10px] font-semibold uppercase tracking-wider flex-shrink-0">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        Live URL Preview
-                    </span>
-                    <span class="font-mono text-slate-400 truncate">
-                        http://127.0.0.1:8000/<span id="slug-preview-display" class="text-[#D4AF69] font-bold">{{ old('slug', 'your-slug') }}</span>
+                    <span class="text-[11px] text-ink-mute flex-shrink-0">URL</span>
+                    <span class="font-mono text-ink-soft truncate">
+                        http://127.0.0.1:8000/<span id="slug-preview-display" class="text-brass-ink font-medium">{{ old('slug', 'your-slug') }}</span>
                     </span>
                 </div>
-                <span class="text-[10px] text-slate-500 self-end sm:self-auto flex-shrink-0">
+                <span class="text-[11px] text-ink-mute self-start sm:self-auto flex-shrink-0">
                     Auto-generated from name
                 </span>
             </div>
         </div>
 
-        <!-- 3. Short Description -->
-        <x-admin.form.textarea 
-            label="Short Description" 
-            name="description" 
+        <x-admin.form.textarea
+            label="Short description"
+            name="description"
             id="portfolio-description-input"
-            rows="4" 
-            placeholder="A brief summary describing the purpose and creative theme of this portfolio..."
+            rows="4"
+            placeholder="A brief summary of this portfolio's purpose and theme"
             maxlength="5000"
-            helper="Recommended 120-160 characters. Used for meta descriptions and header summaries."
+            helper="Used for meta descriptions and header summaries. 120–160 characters reads best."
         />
     </div>
 </div>

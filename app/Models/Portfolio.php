@@ -34,8 +34,19 @@ class Portfolio extends Model
         return $this->hasMany(PortfolioNavItem::class)
             ->orderBy('sort_order');
     }
+
     public function profile(): HasOne
     {
         return $this->hasOne(PortfolioProfile::class);
     }
+
+    public function projects(): HasMany
+    {
+        return $this->hasMany(PortfolioProject::class);
     }
+
+    public function skills(): HasMany
+    {
+        return $this->hasMany(PortfolioSkill::class);
+    }
+}

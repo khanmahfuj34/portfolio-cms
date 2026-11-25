@@ -24,7 +24,9 @@ class PortfolioService
         User $admin,
         array $portfolioData,
         array $profileData,
-        array $navItemsData
+        array $navItemsData,
+        array $skillsData = [],
+        array $projectsData = []
     ): Portfolio {
         // 1. Defensive Invariant Validation for Navbar Items
         $preparedNavItems = $this->validateAndPrepareNavItems($navItemsData);
@@ -41,7 +43,9 @@ class PortfolioService
             $admin,
             $portfolioData,
             $profileData,
-            $preparedNavItems
+            $preparedNavItems,
+            $skillsData,
+            $projectsData
         ) {
             // A. Create Portfolio belonging to authenticated Super Admin
             $portfolio = $admin->portfolios()->create($portfolioData);
@@ -51,6 +55,34 @@ class PortfolioService
 
             // C. Batch-create all validated Navbar items
             $portfolio->navItems()->createMany($preparedNavItems);
+
+            // D. Batch-create validated Skills
+            if (!empty($skillsData)) {
+                $preparedSkills = $this->prepareSkills($skillsData);
+                if (!empty($preparedSkills)) {
+                    $portfolio->skills()->createMany($preparedSkills);
+                }
+            }
+
+            // E. Create validated Projects
+            if (!empty($projectsData)) {
+                foreach ($projectsData as $projectItem) {
+                    if (is_array($projectItem) && !empty($projectItem['title'])) {
+                        $technologies = $this->normalizeTechnologies($projectItem['technologies'] ?? []);
+                        $portfolio->projects()->create([
+                            'title' => trim((string) $projectItem['title']),
+                            'description' => $projectItem['description'] ?? null,
+                            'thumbnail' => $projectItem['thumbnail'] ?? null,
+                            'live_url' => $projectItem['live_url'] ?? null,
+                            'github_url' => $projectItem['github_url'] ?? null,
+                            'technologies' => $technologies,
+                            'is_featured' => !empty($projectItem['is_featured']),
+                            'is_visible' => isset($projectItem['is_visible']) ? (bool) $projectItem['is_visible'] : true,
+                            'sort_order' => (int) ($projectItem['sort_order'] ?? 0),
+                        ]);
+                    }
+                }
+            }
 
             return $portfolio;
         });
@@ -210,5 +242,41 @@ class PortfolioService
         return $portfolio->status === 'published'
             ? $this->unpublish($portfolio)
             : $this->publish($portfolio);
+    }
+
+    /**
+     * Prepare skills list for mass creation, normalizing and deduplicating names.
+     */
+    protected function prepareSkills(array $skillsData): array
+    {
+        $prepared = [];
+        $seen = [];
+        foreach ($skillsData as $skill) {
+            $name = is_array($skill) ? trim((string) ($skill['name'] ?? '')) : trim((string) $skill);
+            $lower = strtolower($name);
+            if ($name !== '' && !in_array($lower, $seen, true)) {
+                $seen[] = $lower;
+                $prepared[] = ['name' => $name];
+            }
+        }
+        return $prepared;
+    }
+
+    /**
+     * Normalize project technologies array.
+     */
+    protected function normalizeTechnologies(array $technologies): array
+    {
+        $normalized = array_map(
+            fn ($technology) => trim((string) $technology),
+            $technologies
+        );
+
+        $normalized = array_filter(
+            $normalized,
+            fn ($technology) => $technology !== ''
+        );
+
+        return array_values(array_unique($normalized));
     }
 }

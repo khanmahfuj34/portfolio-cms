@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PortfolioNavItemController;
 use App\Http\Controllers\Admin\PortfolioController;
 use App\Http\Controllers\PublicPortfolioController;
+use App\Http\Controllers\Admin\PortfolioProjectController;
+use App\Http\Controllers\Admin\PortfolioSkillController;
 
 // Application Root Redirect: if logged in as super admin, go to dashboard; else login
 Route::get('/', function () {
@@ -59,6 +61,10 @@ Route::middleware(['auth', 'super.admin'])
         Route::get('/portfolios/create', [PortfolioController::class, 'create'])
             ->name('portfolios.create');
 
+        Route::get('/portfolios/{portfolio}/edit', [PortfolioController::class, 'edit'])
+            ->name('portfolios.edit')
+            ->whereNumber('portfolio');
+
         Route::post('/portfolios', [PortfolioController::class, 'store'])
             ->name('portfolios.store');
 
@@ -73,6 +79,57 @@ Route::middleware(['auth', 'super.admin'])
         Route::patch('/portfolios/{portfolio}/toggle-publish', [PortfolioController::class, 'togglePublish'])
             ->name('portfolios.toggle-publish')
             ->whereNumber('portfolio');
+
+        // Portfolio Projects
+        Route::scopeBindings()->group(function () {
+
+            Route::get(
+                'portfolios/{portfolio}/projects',
+                [PortfolioProjectController::class, 'index']
+            )->name('portfolios.projects.index');
+
+            Route::post(
+                'portfolios/{portfolio}/projects',
+                [PortfolioProjectController::class, 'store']
+            )->name('portfolios.projects.store');
+
+            Route::put(
+                'portfolios/{portfolio}/projects/{project}',
+                [PortfolioProjectController::class, 'update']
+            )
+            ->whereNumber('portfolio')
+            ->whereNumber('project')
+            ->name('portfolios.projects.update');
+
+            Route::delete(
+                'portfolios/{portfolio}/projects/{project}',
+                [PortfolioProjectController::class, 'destroy']
+            )->name('portfolios.projects.destroy');
+
+
+            // Portfolio Skills
+
+            Route::get(
+                'portfolios/{portfolio}/skills',
+                [PortfolioSkillController::class, 'index']
+            )->name('portfolios.skills.index');
+
+            Route::post(
+                'portfolios/{portfolio}/skills',
+                [PortfolioSkillController::class, 'store']
+            )->name('portfolios.skills.store');
+
+            Route::put(
+                'portfolios/{portfolio}/skills/{skill}',
+                [PortfolioSkillController::class, 'update']
+            )->name('portfolios.skills.update');
+
+            Route::delete(
+                'portfolios/{portfolio}/skills/{skill}',
+                [PortfolioSkillController::class, 'destroy']
+            )->name('portfolios.skills.destroy');
+
+        });
 
 
         // Portfolio Navbar Management
@@ -109,16 +166,11 @@ Route::middleware(['auth', 'super.admin'])
                 Route::patch('/{navItem}/visibility', 'toggleVisibility')
                     ->whereNumber('navItem')
                     ->name('visibility');
+        
                 
 
             });
     });
-
-// Public Portfolio Presentation (Resolved by globally unique slug)
-Route::get('/{slug}', [PublicPortfolioController::class, 'show'])
-    ->name('portfolio.show')
-    ->where('slug', '^[a-z0-9]+(?:-[a-z0-9]+)*$');
-
 
 // Public Portfolio Presentation (Resolved by globally unique slug)
 Route::get('/{slug}', [PublicPortfolioController::class, 'show'])

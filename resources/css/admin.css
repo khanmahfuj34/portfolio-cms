@@ -1,47 +1,60 @@
 /* ==========================================================================
-   Admin Form & Component Styles (Portfolio CMS)
+   Admin surface styles (Portfolio CMS)
+   Flat brass on paper and ink. No gradients, glows or looping motion.
    ========================================================================== */
+
+/* Field focus: one quiet brass ring, no ambient glow */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: none;
+}
 
 /* Dropzone interactive drag-and-drop state */
 .dropzone-box {
-    transition: all 0.2s ease-in-out;
+    transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .dropzone-box.drag-over {
-    border-color: #D4AF69 !important;
-    background-color: rgba(212, 175, 105, 0.08) !important;
-    transform: scale(1.01);
-    box-shadow: 0 0 20px -3px rgba(212, 175, 105, 0.3);
+    border-color: #C5A059 !important;
+    background-color: #F3ECDD !important;
+    box-shadow: inset 0 0 0 1px rgba(197, 160, 89, 0.4);
 }
 
-/* Radio Card Checked States */
+/* Radio card states */
 .status-radio-card {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: border-color 0.18s ease, background-color 0.18s ease;
 }
 
 .status-radio-card:hover {
-    border-color: rgba(212, 175, 105, 0.5);
+    border-color: #C5A059;
 }
 
-/* Input Focus Glows */
-input:focus,
-select:focus,
-textarea:focus {
-    box-shadow: 0 0 0 3px rgba(212, 175, 105, 0.18);
-}
-
-/* Toast Notification Animation */
+/* Toast notification entrance */
 @keyframes toastSlideIn {
     from {
         opacity: 0;
-        transform: translateY(1rem) scale(0.95);
+        transform: translateY(0.5rem);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
     }
 }
 
 .animate-toast {
-    animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: toastSlideIn 0.2s ease-out forwards;
+}
+
+/* Brass index rule — the signature detail */
+.index-rule {
+    width: 2rem;
+    height: 2px;
+    background-color: #C5A059;
+}
+
+/* Tabular figures for all metric values */
+.tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
 }

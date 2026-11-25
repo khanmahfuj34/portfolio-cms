@@ -68,6 +68,16 @@ class PortfolioController extends Controller
     }
 
     /**
+     * Show the form for editing an existing portfolio.
+     */
+    public function edit(Portfolio $portfolio): View
+    {
+        $portfolio->load(['profile', 'navItems', 'skills', 'projects']);
+
+        return view('admin.portfolios.edit', compact('portfolio'));
+    }
+
+    /**
      * Store a newly created portfolio in storage.
      */
     public function store(
@@ -96,11 +106,17 @@ class PortfolioController extends Controller
         // Normalized Navbar Items
         $navItemsData = $validated['nav_items'];
 
+        // Skills & Projects Data
+        $skillsData = $validated['skills'] ?? [];
+        $projectsData = $validated['projects'] ?? [];
+
         $this->portfolioService->create(
             $request->user(),
             $portfolioData,
             $profileData,
-            $navItemsData
+            $navItemsData,
+            $skillsData,
+            $projectsData
         );
 
         return redirect()

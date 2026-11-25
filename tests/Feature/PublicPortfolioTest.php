@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Portfolio;
 use App\Models\PortfolioNavItem;
 use App\Models\PortfolioProfile;
+use App\Models\PortfolioProject;
+use App\Models\PortfolioSkill;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -294,5 +296,207 @@ class PublicPortfolioTest extends TestCase
         $response->assertDontSee('Delete');
         $response->assertDontSee('Edit Profile');
         $response->assertDontSee('csrf');
+    }
+
+    public function test_published_portfolio_renders_skills_and_visible_ordered_projects(): void
+    {
+        $portfolio = Portfolio::create([
+            'user_id' => $this->user->id,
+            'name' => 'Full Showcase Portfolio',
+            'slug' => 'full-showcase',
+            'status' => 'published',
+            'published_at' => now()->subMinute(),
+        ]);
+
+        PortfolioNavItem::create([
+            'portfolio_id' => $portfolio->id,
+            'label' => 'Home',
+            'section_key' => 'home',
+            'sort_order' => 1,
+            'is_visible' => true,
+        ]);
+
+        PortfolioNavItem::create([
+            'portfolio_id' => $portfolio->id,
+            'label' => 'Projects',
+            'section_key' => 'projects',
+            'sort_order' => 2,
+            'is_visible' => true,
+        ]);
+
+        PortfolioNavItem::create([
+            'portfolio_id' => $portfolio->id,
+            'label' => 'Skills',
+            'section_key' => 'skills',
+            'sort_order' => 3,
+            'is_visible' => true,
+        ]);
+
+        PortfolioSkill::create(['portfolio_id' => $portfolio->id, 'name' => 'Laravel']);
+        PortfolioSkill::create(['portfolio_id' => $portfolio->id, 'name' => 'TypeScript']);
+
+        // Project 2 (higher sort_order) created first to confirm ordering by sort_order then id
+        $secondProject = PortfolioProject::create([
+            'portfolio_id' => $portfolio->id,
+            'title' => 'Second Ordered Project',
+            'description' => 'Appears second based on sort order.',
+            'thumbnail' => 'https://example.com/second.jpg',
+            'live_url' => 'https://second.example.com',
+            'github_url' => 'https://github.com/example/second',
+            'technologies' => ['Go', 'Docker'],
+            'is_featured' => false,
+            'is_visible' => true,
+            'sort_order' => 2,
+        ]);
+
+        // Same sort_order tie-breaker by id
+        $firstProjectA = PortfolioProject::create([
+            'portfolio_id' => $portfolio->id,
+            'title' => 'First Ordered Project Alpha',
+            'description' => 'First project summary.',
+            'thumbnail' => 'https://example.com/first.jpg',
+            'live_url' => 'https://first.example.com',
+            'github_url' => 'https://github.com/example/first',
+            'technologies' => ['PHP', 'MySQL'],
+            'is_featured' => true,
+            'is_visible' => true,
+            'sort_order' => 1,
+        ]);
+
+        $firstProjectB = PortfolioProject::create([
+            'portfolio_id' => $portfolio->id,
+            'title' => 'First Ordered Project Beta',
+            'description' => 'Tie-break by id.',
+            'is_featured' => false,
+            'is_visible' => true,
+            'sort_order' => 1,
+        ]);
+
+        PortfolioProject::create([
+            'portfolio_id' => $portfolio->id,
+            'title' => 'Secret Hidden Project',
+            'description' => 'Must never be shown publicly.',
+            'is_visible' => false,
+            'sort_order' => 0,
+        ]);
+
+        $response = $this->get('/full-showcase');
+
+        $response->assertStatus(200);
+        $response->assertDontSee('Content for this section is configured in the portfolio workspace.');
+
+        // Skills rendered
+        $response->assertSee('Laravel');
+        $response->assertSee('TypeScript');
+
+        // Visible projects & fields rendered
+        $response->assertSee('First Ordered Project Alpha');
+        $response->assertSee('First project summary.');
+        $response->assertSee('https://example.com/first.jpg');
+        $response->assertSee('https://first.example.com');
+        $response->assertSee('https://github.com/example/first');
+        $response->assertSee('PHP');
+        $response->assertSee('MySQL');
+        $response->assertSee('Featured');
+
+        $response->assertSee('Second Ordered Project');
+        $response->assertSee('Go');
+        $response->assertSee('Docker');
+
+        // Hidden project never rendered
+        $response->assertDontSee('Secret Hidden Project');
+        $response->assertDontSee('Must never be shown publicly.');
+
+        // Ordering check: sort_order 1 (Alpha then Beta) before sort_order 2 (Second)
+        $content = $response->getContent();
+        $posAlpha = strpos($content, $firstProjectA->title);
+        $posBeta = strpos($content, $firstProjectB->title);
+        $posSecond = strpos($content, $secondProject->title);
+
+        $this->assertNotFalse($posAlpha);
+        $this->assertNotFalse($posBeta);
+        $this->assertNotFalse($posSecond);
+        $this->assertTrue($posAlpha < $posBeta);
+        $this->assertTrue($posBeta < $posSecond);
+    }
+
+    public function test_public_portfolio_handles_empty_skills_and_projects_gracefully(): void
+    {
+        $portfolio = Portfolio::create([
+            'user_id' => $this->user->id,
+            'name' => 'Empty Collections Portfolio',
+            'slug' => 'empty-collections',
+            'status' => 'published',
+            'published_at' => now()->subMinute(),
+        ]);
+
+        PortfolioNavItem::create([
+            'portfolio_id' => $portfolio->id,
+            'label' => 'Home',
+            'section_key' => 'home',
+            'sort_order' => 1,
+            'is_visible' => true,
+        ]);
+
+        PortfolioNavItem::create([
+            'portfolio_id' => $portfolio->id,
+            'label' => 'Projects',
+            'section_key' => 'projects',
+            'sort_order' => 2,
+            'is_visible' => true,
+        ]);
+
+        PortfolioNavItem::create([
+            'portfolio_id' => $portfolio->id,
+            'label' => 'Skills',
+            'section_key' => 'skills',
+            'sort_order' => 3,
+            'is_visible' => true,
+        ]);
+
+        $response = $this->get('/empty-collections');
+
+        $response->assertStatus(200);
+        $response->assertDontSee('Content for this section is configured in the portfolio workspace.');
+        $response->assertSee('No projects have been published yet.');
+        $response->assertSee('No skills have been added yet.');
+    }
+
+    public function test_public_portfolio_projects_and_skills_are_isolated_per_portfolio(): void
+    {
+        $portfolioA = Portfolio::create([
+            'user_id' => $this->user->id,
+            'name' => 'Portfolio Alpha',
+            'slug' => 'iso-alpha',
+            'status' => 'published',
+            'published_at' => now()->subMinute(),
+        ]);
+        PortfolioSkill::create(['portfolio_id' => $portfolioA->id, 'name' => 'AlphaSkillOnly']);
+        PortfolioProject::create([
+            'portfolio_id' => $portfolioA->id,
+            'title' => 'AlphaProjectOnly',
+            'is_visible' => true,
+        ]);
+
+        $portfolioB = Portfolio::create([
+            'user_id' => $this->user->id,
+            'name' => 'Portfolio Beta',
+            'slug' => 'iso-beta',
+            'status' => 'published',
+            'published_at' => now()->subMinute(),
+        ]);
+        PortfolioSkill::create(['portfolio_id' => $portfolioB->id, 'name' => 'BetaSkillOnly']);
+        PortfolioProject::create([
+            'portfolio_id' => $portfolioB->id,
+            'title' => 'BetaProjectOnly',
+            'is_visible' => true,
+        ]);
+
+        $resA = $this->get('/iso-alpha');
+        $resA->assertStatus(200);
+        $resA->assertSee('AlphaSkillOnly');
+        $resA->assertSee('AlphaProjectOnly');
+        $resA->assertDontSee('BetaSkillOnly');
+        $resA->assertDontSee('BetaProjectOnly');
     }
 }

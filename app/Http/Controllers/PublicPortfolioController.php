@@ -44,6 +44,11 @@ class PublicPortfolioController extends Controller
             ->with([
                 'profile',
                 'navItems' => fn ($query) => $query->where('is_visible', true)->orderBy('sort_order', 'asc'),
+                'skills'   => fn ($query) => $query->orderBy('id', 'asc'),
+                'projects' => fn ($query) => $query
+                    ->where('is_visible', true)
+                    ->orderBy('sort_order', 'asc')
+                    ->orderBy('id', 'asc'),
             ]);
 
         // Public visitors can only view published portfolios
@@ -65,6 +70,8 @@ class PublicPortfolioController extends Controller
             'portfolio' => $portfolio,
             'profile'   => $portfolio->profile,
             'navItems'  => $portfolio->navItems,
+            'skills'    => $portfolio->skills,
+            'projects'  => $portfolio->projects,
             'isPreview' => $isPreview,
         ]);
     }

@@ -13,45 +13,34 @@
     $initialCount = $hasOldNavItems ? count($oldNavItems) : 1;
 @endphp
 
-<div class="rounded-2xl bg-white border border-slate-200/80 p-6 sm:p-7 shadow-xs space-y-6 relative overflow-hidden group">
-    <!-- Subtle Ambient Top-Right Accent -->
-    <div class="absolute -top-12 -right-12 w-32 h-32 bg-[#D4AF69]/5 rounded-full blur-2xl group-hover:bg-[#D4AF69]/10 transition-all duration-500 pointer-events-none" aria-hidden="true"></div>
+<div class="rounded-xl bg-surface border border-line p-6 sm:p-7 space-y-6">
 
-    <!-- Section Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-100">
-        <div class="flex items-start gap-4">
-            <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-[#0F1219] to-[#252C3C] text-[#D4AF69] flex items-center justify-center flex-shrink-0 border border-[#D4AF69]/30 shadow-xs">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <!-- Section header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-line">
+        <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-md bg-brass-wash text-brass-ink flex items-center justify-center flex-shrink-0">
+                <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
                 </svg>
             </div>
             <div class="min-w-0">
-                <h3 class="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                    <span>Navbar Configuration</span>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#D4AF69]/15 text-[#9A7326] border border-[#D4AF69]/25">
-                        Site Navigation
-                    </span>
-                </h3>
-                <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                    Configure header navigation links for this portfolio. Support internal section anchors and external URLs.
+                <h3 class="text-sm font-medium text-ink">Navbar Configuration</h3>
+                <p class="text-xs text-ink-mute mt-0.5 leading-relaxed">
+                    Header links for this portfolio. Internal anchors or external URLs.
                 </p>
             </div>
         </div>
 
-        <!-- Live Counter & Add Button -->
         <div class="flex items-center gap-3 self-start sm:self-center">
-            <!-- Counter Badge -->
-            <div id="navbar-counter-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs">
-                <span class="w-2 h-2 rounded-full bg-[#D4AF69]"></span>
+            <span id="navbar-counter-badge" class="text-[11px] text-ink-mute tabular" title="Maximum 10 items">
                 <span id="navbar-counter-label"><span id="navbar-count-display">{{ $initialCount }}</span> / 10 Items</span>
-            </div>
+            </span>
 
-            <!-- Add Item Button -->
-            <button type="button" 
-                    id="btn-add-navbar-item" 
-                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold text-slate-900 bg-[#D4AF69] hover:bg-[#C9A25B] focus:ring-2 focus:ring-[#D4AF69]/30 rounded-xl transition-all shadow-xs {{ $initialCount >= 10 ? 'opacity-40 cursor-not-allowed' : '' }}"
+            <button type="button"
+                    id="btn-add-navbar-item"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#14130F] bg-brass hover:bg-[#B89149] rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brass {{ $initialCount >= 10 ? 'opacity-40 cursor-not-allowed' : '' }}"
                     {{ $initialCount >= 10 ? 'disabled' : '' }}>
-                <svg class="w-3.5 h-3.5 text-slate-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                 </svg>
                 <span>Add Navbar Item</span>
@@ -59,65 +48,63 @@
         </div>
     </div>
 
-    <!-- Collection-level error notice -->
+    <!-- Collection-level error -->
     @error('nav_items')
-        <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2.5 shadow-2xs">
-            <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="p-3.5 rounded-lg bg-[#FBF1EF] border border-[#E9D2CC] border-l-2 border-l-[#B4553F] text-xs flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-[#9C4A3E] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div class="flex-1 font-semibold text-[11px] sm:text-xs">
+            <div class="flex-1 font-medium text-[11px] sm:text-xs text-ink">
                 {{ $message }}
             </div>
         </div>
     @enderror
 
-    <!-- Maximum Limit Reached Notice -->
-    <div id="navbar-limit-message" class="{{ $initialCount >= 10 ? '' : 'hidden' }} p-3.5 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-800 text-xs flex items-center gap-2.5 shadow-2xs">
-        <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <!-- Limit reached -->
+    <div id="navbar-limit-message" class="{{ $initialCount >= 10 ? '' : 'hidden' }} p-3.5 rounded-lg bg-brass-wash/60 border border-[#E7DCC1] text-xs flex items-center gap-2.5">
+        <svg class="w-4 h-4 text-brass-ink flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <div class="flex-1 text-[11px] sm:text-xs">
-            <span class="font-bold">Maximum limit of 10 navbar items reached.</span> Delete an existing item if you need to add a different link.
+        <div class="flex-1 text-[11px] sm:text-xs text-ink-soft">
+            <span class="font-medium text-ink">Maximum of 10 navbar items reached.</span> Delete an item to add a different link.
         </div>
     </div>
 
-    <!-- Dynamic Items List Container -->
-    <div id="navbar-items-container" class="space-y-3.5">
-        
-        <!-- 1. Default Permanent Home Item (Item #1) -->
-        <div class="navbar-item-card rounded-xl border border-slate-200/90 bg-slate-50/70 hover:bg-slate-50 p-4 transition-all duration-200 space-y-3" 
-             data-id="item-home" 
+    <!-- Items list -->
+    <div id="navbar-items-container" class="space-y-3">
+
+        <!-- Default Home item -->
+        <div class="navbar-item-card rounded-lg border border-line bg-paper-sunk/40 p-4 space-y-3"
+             data-id="item-home"
              data-is-default="true">
-            
-            <!-- Card Header: Reorder Controls, Badge, Status & Actions -->
-            <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-slate-200/70">
-                
-                <!-- Reorder Controls & Order Badge -->
+
+            <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-line">
+
                 <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1">
-                        <button type="button" 
-                                class="btn-move-up p-1 text-slate-300 cursor-not-allowed rounded-md transition-colors" 
-                                title="Move up" 
+                    <div class="flex items-center gap-0.5">
+                        <button type="button"
+                                class="btn-move-up p-1 text-line-strong cursor-not-allowed rounded-md"
+                                title="Move up"
                                 disabled>
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
                             </svg>
                         </button>
-                        <button type="button" 
-                                class="btn-move-down p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-200/60 rounded-md transition-colors" 
+                        <button type="button"
+                                class="btn-move-down p-1 text-ink-mute hover:text-ink hover:bg-paper rounded-md transition-colors"
                                 title="Move down">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                     </div>
 
-                    <span class="sort-order-badge inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 rounded-md bg-white border border-slate-200 text-slate-700 font-mono text-[11px] font-bold shadow-2xs">
+                    <span class="sort-order-badge inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 rounded border border-line bg-surface text-ink-soft font-mono text-[11px] tabular">
                         #1
                     </span>
 
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#D4AF69]/20 text-[#8C651B] border border-[#D4AF69]/30">
-                        <svg class="w-3 h-3 text-[#D4AF69]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-brass-wash text-brass-ink text-[10px] font-medium">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                         </svg>
                         Default Home
@@ -127,14 +114,12 @@
                 @php
                     $homeIsVisible = filter_var(old("nav_items.{$homeIndex}.is_visible", '1'), FILTER_VALIDATE_BOOLEAN);
                 @endphp
-                <!-- Right Controls: Visibility & Delete (Permanent lock for Home) -->
                 <div class="flex items-center gap-2">
-                    <!-- Visibility Toggle -->
-                    <button type="button" 
-                            class="btn-toggle-visibility inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium {{ $homeIsVisible ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200/60' }} transition-colors"
+                    <button type="button"
+                            class="btn-toggle-visibility inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium {{ $homeIsVisible ? 'bg-[#EEF3EC] text-[#3F5A38] border border-[#DAE4D5]' : 'bg-paper text-ink-mute border border-line' }} transition-colors"
                             data-visible="{{ $homeIsVisible ? 'true' : 'false' }}"
-                            title="Toggle Visibility">
-                        <svg class="w-3.5 h-3.5 icon-eye" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            title="Toggle visibility">
+                        <svg class="w-3.5 h-3.5 icon-eye" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                             @if($homeIsVisible)
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -147,98 +132,93 @@
                     <input type="hidden" name="nav_items[{{ $homeIndex }}][is_visible]" class="input-is-visible" value="{{ $homeIsVisible ? '1' : '0' }}" />
                     <input type="hidden" name="nav_items[{{ $homeIndex }}][sort_order]" class="input-sort-order" value="{{ old("nav_items.{$homeIndex}.sort_order", 1) }}" />
 
-                    <!-- Permanent Delete Lock (Home cannot be removed) -->
-                    <button type="button" 
-                            class="p-1.5 text-slate-300 cursor-not-allowed rounded-lg" 
-                            title="The default Home item is mandatory and cannot be removed." 
+                    <button type="button"
+                            class="p-1.5 text-line-strong cursor-not-allowed rounded-md"
+                            title="The default Home item cannot be removed."
                             disabled>
-                        <svg class="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
                 </div>
             </div>
 
-            <!-- Card Inputs: Label, Destination Type, and Destination Target -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-start">
-                <!-- 1. Item Label (4 cols) -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
                 <div class="md:col-span-4 space-y-1">
-                    <label class="block text-[11px] font-semibold text-slate-600">
-                        Link Label <span class="text-rose-500">*</span>
+                    <label class="block text-[11px] font-medium text-ink-soft">
+                        Link label <span class="text-brass-ink">*</span>
                     </label>
-                    <input type="text" 
-                           name="nav_items[{{ $homeIndex }}][label]" 
-                           value="{{ old("nav_items.{$homeIndex}.label", 'Home') }}" 
-                           class="w-full py-2 px-3 text-xs bg-white text-slate-800 placeholder-slate-400 border @error("nav_items.{$homeIndex}.label") border-rose-400 ring-1 ring-rose-400/30 @else border-slate-200 @enderror rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-medium" 
-                           placeholder="e.g. Home" 
+                    <input type="text"
+                           name="nav_items[{{ $homeIndex }}][label]"
+                           value="{{ old("nav_items.{$homeIndex}.label", 'Home') }}"
+                           class="w-full py-2 px-3 text-xs bg-surface text-ink placeholder-ink-mute border @error("nav_items.{$homeIndex}.label") border-[#C98A7B] ring-1 ring-[#C98A7B]/30 @else border-line @enderror rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-medium"
+                           placeholder="Home"
                            required />
                     @error("nav_items.{$homeIndex}.label")
-                        <p class="text-[11px] text-rose-600 font-medium mt-1 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <p class="text-[11px] text-[#9C4A3E] font-medium mt-1 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                             <span>{{ $message }}</span>
                         </p>
                     @enderror
                 </div>
 
-                <!-- 2. Destination Type (4 cols) -->
                 <div class="md:col-span-4 space-y-1">
-                    <label class="block text-[11px] font-semibold text-slate-600">
-                        Destination Type <span class="text-rose-500">*</span>
+                    <label class="block text-[11px] font-medium text-ink-soft">
+                        Destination type <span class="text-brass-ink">*</span>
                     </label>
                     <div class="relative">
-                        <select name="nav_items[{{ $homeIndex }}][type]" 
-                                class="destination-type-select appearance-none w-full py-2 pl-3 pr-8 text-xs bg-white text-slate-800 border border-slate-200 rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all cursor-pointer font-medium">
-                            <option value="section" selected>Internal Section (#anchor)</option>
-                            <option value="url">External Web URL (https://)</option>
+                        <select name="nav_items[{{ $homeIndex }}][type]"
+                                class="destination-type-select appearance-none w-full py-2 pl-3 pr-8 text-xs bg-surface text-ink border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors cursor-pointer font-medium">
+                            <option value="section" selected>Internal section (#anchor)</option>
+                            <option value="url">External URL (https://)</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-ink-mute">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                             </svg>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. Destination Target Value (4 cols) -->
                 <div class="md:col-span-4 space-y-1 destination-value-wrapper">
-                    <!-- Section Key Input (active by default) -->
                     <div class="section-key-container">
-                        <label class="block text-[11px] font-semibold text-slate-600">
-                            Section Key <span class="text-rose-500">*</span>
+                        <label class="block text-[11px] font-medium text-ink-soft">
+                            Section key <span class="text-brass-ink">*</span>
                         </label>
-                        <div class="relative rounded-lg shadow-2xs">
-                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#9A7326] font-mono text-xs font-bold">
+                        <div class="relative rounded-lg">
+                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-brass-ink font-mono text-xs">
                                 #
                             </div>
-                            <input type="text" 
-                                   name="nav_items[{{ $homeIndex }}][section_key]" 
-                                   value="{{ old("nav_items.{$homeIndex}.section_key", 'home') }}" 
-                                   class="w-full py-2 pl-7 pr-3 text-xs bg-white text-slate-800 placeholder-slate-400 border @error("nav_items.{$homeIndex}.section_key") border-rose-400 ring-1 ring-rose-400/30 @else border-slate-200 @enderror rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-mono" 
-                                   placeholder="home" 
+                            <input type="text"
+                                   name="nav_items[{{ $homeIndex }}][section_key]"
+                                   value="{{ old("nav_items.{$homeIndex}.section_key", 'home') }}"
+                                   class="w-full py-2 pl-7 pr-3 text-xs bg-surface text-ink placeholder-ink-mute border @error("nav_items.{$homeIndex}.section_key") border-[#C98A7B] ring-1 ring-[#C98A7B]/30 @else border-line @enderror rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-mono"
+                                   placeholder="home"
                                    required />
                         </div>
                         @error("nav_items.{$homeIndex}.section_key")
-                            <p class="text-[11px] text-rose-600 font-medium mt-1 flex items-center gap-1">
-                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <p class="text-[11px] text-[#9C4A3E] font-medium mt-1 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                 <span>{{ $message }}</span>
                             </p>
                         @enderror
                     </div>
 
-                    <!-- External URL Input (hidden by default for Home) -->
                     <div class="external-url-container hidden">
-                        <label class="block text-[11px] font-semibold text-slate-600">
-                            External URL <span class="text-rose-500">*</span>
+                        <label class="block text-[11px] font-medium text-ink-soft">
+                            External URL <span class="text-brass-ink">*</span>
                         </label>
-                        <div class="relative rounded-lg shadow-2xs">
-                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 font-mono text-xs">
-                                🔗
+                        <div class="relative rounded-lg">
+                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-ink-mute">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                </svg>
                             </div>
-                            <input type="url" 
-                                   name="nav_items[{{ $homeIndex }}][url]" 
-                                   value="{{ old("nav_items.{$homeIndex}.url", '') }}" 
-                                   class="w-full py-2 pl-7 pr-3 text-xs bg-white text-slate-800 placeholder-slate-400 border border-slate-200 rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-mono" 
-                                   placeholder="https://example.com" 
+                            <input type="url"
+                                   name="nav_items[{{ $homeIndex }}][url]"
+                                   value="{{ old("nav_items.{$homeIndex}.url", '') }}"
+                                   class="w-full py-2 pl-7 pr-3 text-xs bg-surface text-ink placeholder-ink-mute border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-mono"
+                                   placeholder="https://example.com"
                                    disabled />
                         </div>
                     </div>
@@ -247,7 +227,7 @@
 
         </div>
 
-        <!-- Custom Navbar Items (Rehydrated from old input on validation failure) -->
+        <!-- Custom items from old input -->
         @if($hasOldNavItems)
             @foreach($oldNavItems as $index => $item)
                 @if($index == $homeIndex)
@@ -259,47 +239,44 @@
                     $itemOrder = old("nav_items.{$index}.sort_order", $item['sort_order'] ?? $loop->iteration);
                     $itemVisible = filter_var(old("nav_items.{$index}.is_visible", $item['is_visible'] ?? true), FILTER_VALIDATE_BOOLEAN);
                 @endphp
-                <div class="navbar-item-card rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50/50 p-4 transition-all duration-200 space-y-3 shadow-2xs" 
-                     data-id="item-{{ $index }}" 
+                <div class="navbar-item-card rounded-lg border border-line bg-surface p-4 space-y-3"
+                     data-id="item-{{ $index }}"
                      data-is-default="false">
-                    
-                    <!-- Card Header: Reorder Controls, Badge, Status & Actions -->
-                    <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-slate-100">
+
+                    <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-line">
                         <div class="flex items-center gap-2">
-                            <div class="flex items-center gap-1">
-                                <button type="button" 
-                                        class="btn-move-up p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors" 
+                            <div class="flex items-center gap-0.5">
+                                <button type="button"
+                                        class="btn-move-up p-1 text-ink-mute hover:text-ink hover:bg-paper rounded-md transition-colors"
                                         title="Move up">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
                                     </svg>
                                 </button>
-                                <button type="button" 
-                                        class="btn-move-down p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors" 
+                                <button type="button"
+                                        class="btn-move-down p-1 text-ink-mute hover:text-ink hover:bg-paper rounded-md transition-colors"
                                         title="Move down">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
                             </div>
 
-                            <span class="sort-order-badge inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 font-mono text-[11px] font-bold shadow-2xs">
+                            <span class="sort-order-badge inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 rounded border border-line bg-paper text-ink-soft font-mono text-[11px] tabular">
                                 #{{ $itemOrder }}
                             </span>
 
-                            <span class="item-type-pill inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                                Custom Link
+                            <span class="item-type-pill inline-flex items-center px-1.5 py-0.5 rounded bg-paper text-ink-mute text-[10px] font-medium border border-line">
+                                Custom
                             </span>
                         </div>
 
-                        <!-- Right Controls: Visibility & Delete -->
                         <div class="flex items-center gap-2">
-                            <!-- Visibility Toggle -->
-                            <button type="button" 
-                                    class="btn-toggle-visibility inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium {{ $itemVisible ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200/60' }} transition-colors"
+                            <button type="button"
+                                    class="btn-toggle-visibility inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium {{ $itemVisible ? 'bg-[#EEF3EC] text-[#3F5A38] border border-[#DAE4D5]' : 'bg-paper text-ink-mute border border-line' }} transition-colors"
                                     data-visible="{{ $itemVisible ? 'true' : 'false' }}"
-                                    title="Toggle Visibility">
-                                <svg class="w-3.5 h-3.5 icon-eye" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    title="Toggle visibility">
+                                <svg class="w-3.5 h-3.5 icon-eye" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                                     @if($itemVisible)
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -312,102 +289,97 @@
                             <input type="hidden" name="nav_items[{{ $index }}][is_visible]" class="input-is-visible" value="{{ $itemVisible ? '1' : '0' }}" />
                             <input type="hidden" name="nav_items[{{ $index }}][sort_order]" class="input-sort-order" value="{{ $itemOrder }}" />
 
-                            <!-- Remove Item Button -->
-                            <button type="button" 
-                                    class="btn-remove-item p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" 
+                            <button type="button"
+                                    class="btn-remove-item p-1.5 text-ink-mute hover:text-[#9C4A3E] hover:bg-[#F7ECE9] rounded-md transition-colors"
                                     title="Remove this navbar link">
-                                <svg class="w-4 h-4 text-slate-400 hover:text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Card Inputs: Label, Destination Type, and Destination Target -->
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-start">
-                        <!-- 1. Item Label (4 cols) -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
                         <div class="md:col-span-4 space-y-1">
-                            <label class="block text-[11px] font-semibold text-slate-600">
-                                Link Label <span class="text-rose-500">*</span>
+                            <label class="block text-[11px] font-medium text-ink-soft">
+                                Link label <span class="text-brass-ink">*</span>
                             </label>
-                            <input type="text" 
-                                   name="nav_items[{{ $index }}][label]" 
-                                   value="{{ old("nav_items.{$index}.label", $item['label'] ?? '') }}" 
-                                   class="input-nav-label w-full py-2 px-3 text-xs bg-white text-slate-800 placeholder-slate-400 border @error("nav_items.{$index}.label") border-rose-400 ring-1 ring-rose-400/30 @else border-slate-200 @enderror rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-medium" 
-                                   placeholder="e.g. About, Projects, Contact" 
+                            <input type="text"
+                                   name="nav_items[{{ $index }}][label]"
+                                   value="{{ old("nav_items.{$index}.label", $item['label'] ?? '') }}"
+                                   class="input-nav-label w-full py-2 px-3 text-xs bg-surface text-ink placeholder-ink-mute border @error("nav_items.{$index}.label") border-[#C98A7B] ring-1 ring-[#C98A7B]/30 @else border-line @enderror rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-medium"
+                                   placeholder="About, Projects, Contact"
                                    required />
                             @error("nav_items.{$index}.label")
-                                <p class="text-[11px] text-rose-600 font-medium mt-1 flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <p class="text-[11px] text-[#9C4A3E] font-medium mt-1 flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                     <span>{{ $message }}</span>
                                 </p>
                             @enderror
                         </div>
 
-                        <!-- 2. Destination Type (4 cols) -->
                         <div class="md:col-span-4 space-y-1">
-                            <label class="block text-[11px] font-semibold text-slate-600">
-                                Destination Type <span class="text-rose-500">*</span>
+                            <label class="block text-[11px] font-medium text-ink-soft">
+                                Destination type <span class="text-brass-ink">*</span>
                             </label>
                             <div class="relative">
-                                <select name="nav_items[{{ $index }}][type]" 
-                                        class="destination-type-select appearance-none w-full py-2 pl-3 pr-8 text-xs bg-white text-slate-800 border border-slate-200 rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all cursor-pointer font-medium">
-                                    <option value="section" {{ $isSection ? 'selected' : '' }}>Internal Section (#anchor)</option>
-                                    <option value="url" {{ ! $isSection ? 'selected' : '' }}>External Web URL (https://)</option>
+                                <select name="nav_items[{{ $index }}][type]"
+                                        class="destination-type-select appearance-none w-full py-2 pl-3 pr-8 text-xs bg-surface text-ink border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors cursor-pointer font-medium">
+                                    <option value="section" {{ $isSection ? 'selected' : '' }}>Internal section (#anchor)</option>
+                                    <option value="url" {{ ! $isSection ? 'selected' : '' }}>External URL (https://)</option>
                                 </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-ink-mute">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. Destination Target Value (4 cols) -->
                         <div class="md:col-span-4 space-y-1 destination-value-wrapper">
-                            <!-- Section Key Input -->
                             <div class="section-key-container {{ $isSection ? '' : 'hidden' }}">
-                                <label class="block text-[11px] font-semibold text-slate-600">
-                                    Section Key <span class="text-rose-500">*</span>
+                                <label class="block text-[11px] font-medium text-ink-soft">
+                                    Section key <span class="text-brass-ink">*</span>
                                 </label>
-                                <div class="relative rounded-lg shadow-2xs">
-                                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#9A7326] font-mono text-xs font-bold">
+                                <div class="relative rounded-lg">
+                                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-brass-ink font-mono text-xs">
                                         #
                                     </div>
-                                    <input type="text" 
-                                           name="nav_items[{{ $index }}][section_key]" 
-                                           value="{{ old("nav_items.{$index}.section_key", $item['section_key'] ?? '') }}" 
-                                           class="input-section-key w-full py-2 pl-7 pr-3 text-xs bg-white text-slate-800 placeholder-slate-400 border @error("nav_items.{$index}.section_key") border-rose-400 ring-1 ring-rose-400/30 @else border-slate-200 @enderror rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-mono" 
-                                           placeholder="e.g. about, skills, contact" 
+                                    <input type="text"
+                                           name="nav_items[{{ $index }}][section_key]"
+                                           value="{{ old("nav_items.{$index}.section_key", $item['section_key'] ?? '') }}"
+                                           class="input-section-key w-full py-2 pl-7 pr-3 text-xs bg-surface text-ink placeholder-ink-mute border @error("nav_items.{$index}.section_key") border-[#C98A7B] ring-1 ring-[#C98A7B]/30 @else border-line @enderror rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-mono"
+                                           placeholder="about, skills, contact"
                                            {{ $isSection ? 'required' : 'disabled' }} />
                                 </div>
                                 @error("nav_items.{$index}.section_key")
-                                    <p class="text-[11px] text-rose-600 font-medium mt-1 flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    <p class="text-[11px] text-[#9C4A3E] font-medium mt-1 flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                         <span>{{ $message }}</span>
                                     </p>
                                 @enderror
                             </div>
 
-                            <!-- External URL Input -->
                             <div class="external-url-container {{ $isSection ? 'hidden' : '' }}">
-                                <label class="block text-[11px] font-semibold text-slate-600">
-                                    External URL <span class="text-rose-500">*</span>
+                                <label class="block text-[11px] font-medium text-ink-soft">
+                                    External URL <span class="text-brass-ink">*</span>
                                 </label>
-                                <div class="relative rounded-lg shadow-2xs">
-                                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 font-mono text-xs">
-                                        🔗
+                                <div class="relative rounded-lg">
+                                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-ink-mute">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                        </svg>
                                     </div>
-                                    <input type="url" 
-                                           name="nav_items[{{ $index }}][url]" 
-                                           value="{{ old("nav_items.{$index}.url", $item['url'] ?? '') }}" 
-                                           class="input-external-url w-full py-2 pl-7 pr-3 text-xs bg-white text-slate-800 placeholder-slate-400 border @error("nav_items.{$index}.url") border-rose-400 ring-1 ring-rose-400/30 @else border-slate-200 @enderror rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-mono" 
-                                           placeholder="https://github.com/example" 
+                                    <input type="url"
+                                           name="nav_items[{{ $index }}][url]"
+                                           value="{{ old("nav_items.{$index}.url", $item['url'] ?? '') }}"
+                                           class="input-external-url w-full py-2 pl-7 pr-3 text-xs bg-surface text-ink placeholder-ink-mute border @error("nav_items.{$index}.url") border-[#C98A7B] ring-1 ring-[#C98A7B]/30 @else border-line @enderror rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-mono"
+                                           placeholder="https://github.com/example"
                                            {{ $isSection ? 'disabled' : 'required' }} />
                                 </div>
                                 @error("nav_items.{$index}.url")
-                                    <p class="text-[11px] text-rose-600 font-medium mt-1 flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    <p class="text-[11px] text-[#9C4A3E] font-medium mt-1 flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                         <span>{{ $message }}</span>
                                     </p>
                                 @enderror
@@ -421,51 +393,47 @@
 
     </div>
 
-    <!-- Template for Dynamically Added Navbar Items (Used by JavaScript) -->
+    <!-- JS template -->
     <template id="navbar-item-template">
-        <div class="navbar-item-card rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50/50 p-4 transition-all duration-200 space-y-3 shadow-2xs" 
-             data-id="__ID__" 
+        <div class="navbar-item-card rounded-lg border border-line bg-surface p-4 space-y-3"
+             data-id="__ID__"
              data-is-default="false">
-            
-            <!-- Card Header: Reorder Controls, Badge, Status & Actions -->
-            <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-slate-100">
-                
-                <!-- Reorder Controls & Order Badge -->
+
+            <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-line">
+
                 <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-1">
-                        <button type="button" 
-                                class="btn-move-up p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors" 
+                    <div class="flex items-center gap-0.5">
+                        <button type="button"
+                                class="btn-move-up p-1 text-ink-mute hover:text-ink hover:bg-paper rounded-md transition-colors"
                                 title="Move up">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
                             </svg>
                         </button>
-                        <button type="button" 
-                                class="btn-move-down p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors" 
+                        <button type="button"
+                                class="btn-move-down p-1 text-ink-mute hover:text-ink hover:bg-paper rounded-md transition-colors"
                                 title="Move down">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
                     </div>
 
-                    <span class="sort-order-badge inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 font-mono text-[11px] font-bold shadow-2xs">
+                    <span class="sort-order-badge inline-flex items-center justify-center min-w-[24px] h-6 px-1.5 rounded border border-line bg-paper text-ink-soft font-mono text-[11px] tabular">
                         #__ORDER__
                     </span>
 
-                    <span class="item-type-pill inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                        Custom Link
+                    <span class="item-type-pill inline-flex items-center px-1.5 py-0.5 rounded bg-paper text-ink-mute text-[10px] font-medium border border-line">
+                        Custom
                     </span>
                 </div>
 
-                <!-- Right Controls: Visibility & Delete -->
                 <div class="flex items-center gap-2">
-                    <!-- Visibility Toggle -->
-                    <button type="button" 
-                            class="btn-toggle-visibility inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                    <button type="button"
+                            class="btn-toggle-visibility inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-medium bg-[#EEF3EC] text-[#3F5A38] border border-[#DAE4D5] transition-colors"
                             data-visible="true"
-                            title="Toggle Visibility">
-                        <svg class="w-3.5 h-3.5 icon-eye" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            title="Toggle visibility">
+                        <svg class="w-3.5 h-3.5 icon-eye" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                         </svg>
@@ -474,85 +442,80 @@
                     <input type="hidden" name="nav_items[__INDEX__][is_visible]" class="input-is-visible" value="1" />
                     <input type="hidden" name="nav_items[__INDEX__][sort_order]" class="input-sort-order" value="__ORDER__" />
 
-                    <!-- Remove Item Button -->
-                    <button type="button" 
-                            class="btn-remove-item p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" 
+                    <button type="button"
+                            class="btn-remove-item p-1.5 text-ink-mute hover:text-[#9C4A3E] hover:bg-[#F7ECE9] rounded-md transition-colors"
                             title="Remove this navbar link">
-                        <svg class="w-4 h-4 text-slate-400 hover:text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
                 </div>
             </div>
 
-            <!-- Card Inputs: Label, Destination Type, and Destination Target -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-start">
-                <!-- 1. Item Label (4 cols) -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
                 <div class="md:col-span-4 space-y-1">
-                    <label class="block text-[11px] font-semibold text-slate-600">
-                        Link Label <span class="text-rose-500">*</span>
+                    <label class="block text-[11px] font-medium text-ink-soft">
+                        Link label <span class="text-brass-ink">*</span>
                     </label>
-                    <input type="text" 
-                           name="nav_items[__INDEX__][label]" 
-                           value="__LABEL__" 
-                           class="input-nav-label w-full py-2 px-3 text-xs bg-white text-slate-800 placeholder-slate-400 border border-slate-200 rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-medium" 
-                           placeholder="e.g. About, Projects, Contact" 
+                    <input type="text"
+                           name="nav_items[__INDEX__][label]"
+                           value="__LABEL__"
+                           class="input-nav-label w-full py-2 px-3 text-xs bg-surface text-ink placeholder-ink-mute border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-medium"
+                           placeholder="About, Projects, Contact"
                            required />
                 </div>
 
-                <!-- 2. Destination Type (4 cols) -->
                 <div class="md:col-span-4 space-y-1">
-                    <label class="block text-[11px] font-semibold text-slate-600">
-                        Destination Type <span class="text-rose-500">*</span>
+                    <label class="block text-[11px] font-medium text-ink-soft">
+                        Destination type <span class="text-brass-ink">*</span>
                     </label>
                     <div class="relative">
-                        <select name="nav_items[__INDEX__][type]" 
-                                class="destination-type-select appearance-none w-full py-2 pl-3 pr-8 text-xs bg-white text-slate-800 border border-slate-200 rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all cursor-pointer font-medium">
-                            <option value="section" selected>Internal Section (#anchor)</option>
-                            <option value="url">External Web URL (https://)</option>
+                        <select name="nav_items[__INDEX__][type]"
+                                class="destination-type-select appearance-none w-full py-2 pl-3 pr-8 text-xs bg-surface text-ink border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors cursor-pointer font-medium">
+                            <option value="section" selected>Internal section (#anchor)</option>
+                            <option value="url">External URL (https://)</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-ink-mute">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                             </svg>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. Destination Target Value (4 cols) -->
                 <div class="md:col-span-4 space-y-1 destination-value-wrapper">
-                    <!-- Section Key Input -->
                     <div class="section-key-container">
-                        <label class="block text-[11px] font-semibold text-slate-600">
-                            Section Key <span class="text-rose-500">*</span>
+                        <label class="block text-[11px] font-medium text-ink-soft">
+                            Section key <span class="text-brass-ink">*</span>
                         </label>
-                        <div class="relative rounded-lg shadow-2xs">
-                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[#9A7326] font-mono text-xs font-bold">
+                        <div class="relative rounded-lg">
+                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-brass-ink font-mono text-xs">
                                 #
                             </div>
-                            <input type="text" 
-                                   name="nav_items[__INDEX__][section_key]" 
-                                   value="__SECTION_KEY__" 
-                                   class="input-section-key w-full py-2 pl-7 pr-3 text-xs bg-white text-slate-800 placeholder-slate-400 border border-slate-200 rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-mono" 
-                                   placeholder="e.g. about, skills, contact" 
+                            <input type="text"
+                                   name="nav_items[__INDEX__][section_key]"
+                                   value="__SECTION_KEY__"
+                                   class="input-section-key w-full py-2 pl-7 pr-3 text-xs bg-surface text-ink placeholder-ink-mute border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-mono"
+                                   placeholder="about, skills, contact"
                                    required />
                         </div>
                     </div>
 
-                    <!-- External URL Input (hidden initially for section) -->
                     <div class="external-url-container hidden">
-                        <label class="block text-[11px] font-semibold text-slate-600">
-                            External URL <span class="text-rose-500">*</span>
+                        <label class="block text-[11px] font-medium text-ink-soft">
+                            External URL <span class="text-brass-ink">*</span>
                         </label>
-                        <div class="relative rounded-lg shadow-2xs">
-                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400 font-mono text-xs">
-                                🔗
+                        <div class="relative rounded-lg">
+                            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-ink-mute">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                </svg>
                             </div>
-                            <input type="url" 
-                                   name="nav_items[__INDEX__][url]" 
-                                   value="" 
-                                   class="input-external-url w-full py-2 pl-7 pr-3 text-xs bg-white text-slate-800 placeholder-slate-400 border border-slate-200 rounded-lg focus:outline-none focus:border-[#D4AF69] focus:ring-1 focus:ring-[#D4AF69] transition-all font-mono" 
-                                   placeholder="https://github.com/example" 
+                            <input type="url"
+                                   name="nav_items[__INDEX__][url]"
+                                   value=""
+                                   class="input-external-url w-full py-2 pl-7 pr-3 text-xs bg-surface text-ink placeholder-ink-mute border border-line rounded-lg focus:outline-none focus:border-brass focus:ring-2 focus:ring-brass/20 transition-colors font-mono"
+                                   placeholder="https://github.com/example"
                                    disabled />
                         </div>
                     </div>

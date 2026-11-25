@@ -24,6 +24,43 @@ class StorePortfolioRequest extends FormRequest
         if (! $this->has('status')) {
             $this->merge(['status' => 'draft']);
         }
+
+        // Normalize skills if provided
+        if ($this->has('skills') && is_array($this->skills)) {
+            $normalizedSkills = [];
+            foreach ($this->skills as $skill) {
+                if (is_array($skill) && isset($skill['name'])) {
+                    $name = trim((string) $skill['name']);
+                    if ($name !== '') {
+                        $normalizedSkills[] = ['name' => $name];
+                    }
+                } elseif (is_string($skill) && trim($skill) !== '') {
+                    $normalizedSkills[] = ['name' => trim($skill)];
+                }
+            }
+            $this->merge(['skills' => $normalizedSkills]);
+        }
+
+        // Normalize projects if provided
+        if ($this->has('projects') && is_array($this->projects)) {
+            $normalizedProjects = [];
+            foreach ($this->projects as $project) {
+                if (is_array($project)) {
+                    $techs = $project['technologies'] ?? [];
+                    if (is_string($techs)) {
+                        $techs = array_values(array_filter(array_map('trim', explode(',', $techs))));
+                    } elseif (is_array($techs)) {
+                        $techs = array_values(array_filter(array_map(fn($t) => trim((string)$t), $techs)));
+                    }
+                    $project['technologies'] = $techs;
+                    $project['is_featured'] = !empty($project['is_featured']) && $project['is_featured'] !== '0';
+                    $project['is_visible'] = isset($project['is_visible']) ? (!empty($project['is_visible']) && $project['is_visible'] !== '0') : true;
+                    $project['sort_order'] = isset($project['sort_order']) ? (int) $project['sort_order'] : 0;
+                    $normalizedProjects[] = $project;
+                }
+            }
+            $this->merge(['projects' => $normalizedProjects]);
+        }
     }
 
     /**
@@ -137,6 +174,75 @@ class StorePortfolioRequest extends FormRequest
             'nav_items.*.is_visible' => [
                 'required',
                 'boolean',
+            ],
+
+            // Skills Configuration
+            'skills' => [
+                'nullable',
+                'array',
+                'max:50',
+            ],
+            'skills.*.name' => [
+                'required',
+                'string',
+                'max:100',
+                'distinct:ignore_case',
+            ],
+
+            // Projects Configuration
+            'projects' => [
+                'nullable',
+                'array',
+                'max:50',
+            ],
+            'projects.*.title' => [
+                'required',
+                'string',
+                'max:150',
+            ],
+            'projects.*.description' => [
+                'nullable',
+                'string',
+                'max:5000',
+            ],
+            'projects.*.thumbnail' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+            'projects.*.live_url' => [
+                'nullable',
+                'url',
+                'max:255',
+            ],
+            'projects.*.github_url' => [
+                'nullable',
+                'url',
+                'max:255',
+            ],
+            'projects.*.technologies' => [
+                'nullable',
+                'array',
+                'max:30',
+            ],
+            'projects.*.technologies.*' => [
+                'required',
+                'string',
+                'max:50',
+                'distinct:ignore_case',
+            ],
+            'projects.*.is_featured' => [
+                'sometimes',
+                'boolean',
+            ],
+            'projects.*.is_visible' => [
+                'sometimes',
+                'boolean',
+            ],
+            'projects.*.sort_order' => [
+                'sometimes',
+                'integer',
+                'min:0',
             ],
         ];
     }

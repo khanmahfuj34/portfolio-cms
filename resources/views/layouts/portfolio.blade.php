@@ -20,38 +20,39 @@
 
     <style>
         :root {
-            --color-gold: #D4AF69;
-            --color-gold-light: #F2DAA4;
-            --color-gold-dark: #A5803B;
-            --color-charcoal-deep: #0B0D12;
-            --color-charcoal-card: #141822;
-            --color-charcoal-border: #1E2330;
+            --color-brass: #C5A059;
+            --color-brass-hover: #B69149;
+            --color-brass-muted: #E2C78E;
+            --color-bg-base: #0D0F14;
+            --color-bg-surface: #131720;
+            --color-bg-elevated: #1A202C;
+            --color-hairline: rgba(255, 255, 255, 0.08);
         }
 
         body {
             font-family: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
-            background-color: var(--color-charcoal-deep);
-            color: #F8FAFC;
+            background-color: var(--color-bg-base);
+            color: #F1F5F9;
         }
 
-        /* Custom subtle scrollbars */
+        /* Quiet scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #0B0D12;
+            background: #0D0F14;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1E2330;
+            background: rgba(255, 255, 255, 0.12);
             border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #D4AF69;
+            background: rgba(255, 255, 255, 0.25);
         }
     </style>
 </head>
-<body class="min-h-full flex flex-col bg-[#0B0D12] text-slate-100 antialiased selection:bg-[#D4AF69]/20 selection:text-[#D4AF69]">
+<body class="min-h-full flex flex-col bg-[#0D0F14] text-slate-100 antialiased selection:bg-[#C5A059]/25 selection:text-[#E2C78E]">
 
     @yield('content')
 
