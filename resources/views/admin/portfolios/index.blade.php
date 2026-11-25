@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@inject('domainService', 'App\Services\PortfolioDomainService')
 
 @section('title', 'Profiles List — Portfolio CMS')
 @section('page_title', 'Profiles')
@@ -147,7 +148,20 @@
                                                 <span class="truncate">{{ $portfolio->profile->professional_title }}</span>
                                             @endif
                                         </div>
-                                        <div class="mt-0.5">
+                                        <div class="mt-0.5 flex flex-wrap items-center gap-2">
+                                            @if ($portfolio->primaryDomain)
+                                                <a href="{{ $domainService->publicUrlFor($portfolio->primaryDomain, request()) }}"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer"
+                                                   class="inline-flex items-center gap-1 text-[11px] text-brass-ink hover:underline truncate font-mono"
+                                                   title="Open portfolio subdomain">
+                                                    <span>{{ $portfolio->primaryDomain->domain }}</span>
+                                                    <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                                    </svg>
+                                                </a>
+                                                <span class="text-line-strong text-[11px]">·</span>
+                                            @endif
                                             <a href="{{ url('/' . $portfolio->slug) }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] text-ink-mute hover:text-brass-ink transition-colors truncate font-mono">
                                                 <span>/{{ $portfolio->slug }}</span>
                                                 <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+@inject('domainService', 'App\Services\PortfolioDomainService')
 
 @section('title', 'Edit Portfolio — ' . $portfolio->name . ' — Super Admin')
 @section('page_title', 'Edit Portfolio')
@@ -36,7 +37,7 @@
                     </svg>
                     <span>Back to profiles</span>
                 </a>
-                <a href="{{ url('/' . $portfolio->slug) }}"
+                <a href="{{ $portfolio->primaryDomain ? $domainService->publicUrlFor($portfolio->primaryDomain, request()) : url('/' . $portfolio->slug) }}"
                    target="_blank"
                    rel="noopener noreferrer"
                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium bg-brass text-[#14130F] hover:bg-[#B89149] transition-colors">

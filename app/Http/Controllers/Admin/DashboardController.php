@@ -18,7 +18,7 @@ class DashboardController extends Controller
         $search = trim((string) $request->query('search', ''));
         $status = $request->query('status');
 
-        $portfoliosQuery = Portfolio::with(['profile', 'user'])
+        $portfoliosQuery = Portfolio::with(['profile', 'user', 'primaryDomain'])
             ->withCount('navItems');
 
         if ($search !== '') {

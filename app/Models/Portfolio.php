@@ -49,4 +49,14 @@ class Portfolio extends Model
     {
         return $this->hasMany(PortfolioSkill::class);
     }
+
+    public function domains(): HasMany
+    {
+        return $this->hasMany(PortfolioDomain::class);
+    }
+
+    public function primaryDomain(): HasOne
+    {
+        return $this->hasOne(PortfolioDomain::class)->where('is_primary', true);
+    }
 }

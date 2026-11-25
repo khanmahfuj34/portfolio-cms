@@ -10,8 +10,13 @@ use Throwable;
 
 class PortfolioService
 {
+    public function __construct(
+        private readonly PortfolioDomainService $domainService
+    ) {}
+
     /**
-     * Atomically create a Portfolio, its associated Profile, and all submitted Navbar items.
+     * Atomically create a Portfolio, its associated Profile, Navbar items,
+     * optional Skills/Projects, and default primary subdomain.
      *
      * @param User $admin Authenticated Super Admin creator
      * @param array $portfolioData Core portfolio attributes
@@ -83,6 +88,9 @@ class PortfolioService
                     }
                 }
             }
+
+            // F. Create default verified primary local subdomain inside the same transaction
+            $this->domainService->createDefaultSubdomain($portfolio);
 
             return $portfolio;
         });

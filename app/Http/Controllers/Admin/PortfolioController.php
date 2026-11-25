@@ -25,7 +25,7 @@ class PortfolioController extends Controller
         $search = trim((string) $request->query('search', ''));
         $status = $request->query('status');
 
-        $portfoliosQuery = Portfolio::with(['profile', 'user'])
+        $portfoliosQuery = Portfolio::with(['profile', 'user', 'primaryDomain'])
             ->withCount('navItems');
 
         if ($search !== '') {
@@ -72,7 +72,7 @@ class PortfolioController extends Controller
      */
     public function edit(Portfolio $portfolio): View
     {
-        $portfolio->load(['profile', 'navItems', 'skills', 'projects']);
+        $portfolio->load(['profile', 'navItems', 'skills', 'projects', 'primaryDomain']);
 
         return view('admin.portfolios.edit', compact('portfolio'));
     }

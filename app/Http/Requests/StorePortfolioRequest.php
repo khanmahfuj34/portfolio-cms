@@ -2,9 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Models\PortfolioDomain;
+use App\Services\PortfolioDomainService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use InvalidArgumentException;
 
 class StorePortfolioRequest extends FormRequest
 {
@@ -81,7 +84,7 @@ class StorePortfolioRequest extends FormRequest
             'slug' => [
                 'required',
                 'string',
-                'max:150',
+                'max:63',
                 'alpha_dash',
                 Rule::unique('portfolios', 'slug'),
             ],
@@ -253,6 +256,22 @@ class StorePortfolioRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator) {
+            $rawSlug = $this->input('slug');
+            if (is_string($rawSlug) && trim($rawSlug) !== '' && ! $validator->errors()->has('slug')) {
+                $domainService = app(PortfolioDomainService::class);
+                try {
+                    $hostname = $domainService->buildSubdomainHostname($rawSlug);
+                    if (PortfolioDomain::where('domain', $hostname)->exists()) {
+                        $validator->errors()->add(
+                            'slug',
+                            "The subdomain '{$hostname}' is already registered."
+                        );
+                    }
+                } catch (InvalidArgumentException $e) {
+                    $validator->errors()->add('slug', $e->getMessage());
+                }
+            }
+
             $rawItems = $this->input('nav_items');
 
             if (! is_array($rawItems)) {
