@@ -198,7 +198,7 @@
                                         <form method="POST"
                                               action="{{ route('admin.portfolios.unpublish', $portfolio) }}"
                                               class="inline"
-                                              onsubmit="return confirm('Are you sure you want to unpublish &quot;{{ addslashes($portfolio->name) }}&quot;? It will return to draft and become hidden from public visitors.');">
+                                              data-confirm='Are you sure you want to unpublish "{{ $portfolio->name }}"? It will return to draft and become hidden from public visitors.'>
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit"
@@ -214,7 +214,7 @@
                                         <form method="POST"
                                               action="{{ route('admin.portfolios.publish', $portfolio) }}"
                                               class="inline"
-                                              onsubmit="return confirm('Are you sure you want to publish &quot;{{ addslashes($portfolio->name) }}&quot;? It will be publicly accessible at /{{ $portfolio->slug }}.');">
+                                              data-confirm='Are you sure you want to publish "{{ $portfolio->name }}"? It will be publicly accessible at /{{ $portfolio->slug }}.'>
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit"

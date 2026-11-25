@@ -64,7 +64,7 @@ class PortfolioCreationTest extends TestCase
 
     public function test_super_admin_can_access_portfolio_creation_page(): void
     {
-        $response = $this->actingAs($this->superAdmin)
+        $response = $this->actingAs($this->superAdmin, 'super_admin')
             ->get('/admin/portfolios/create');
 
         $response->assertStatus(200);
@@ -116,7 +116,7 @@ class PortfolioCreationTest extends TestCase
             'status' => 'published',
         ]);
 
-        $response = $this->actingAs($this->superAdmin)
+        $response = $this->actingAs($this->superAdmin, 'super_admin')
             ->post('/admin/portfolios', $data);
 
         $response->assertStatus(302);
@@ -157,7 +157,7 @@ class PortfolioCreationTest extends TestCase
             'professional_title' => 'Design Director',
         ]);
 
-        $response = $this->actingAs($this->superAdmin)
+        $response = $this->actingAs($this->superAdmin, 'super_admin')
             ->post('/admin/portfolios', $data);
 
         $response->assertStatus(302);
@@ -174,14 +174,14 @@ class PortfolioCreationTest extends TestCase
         $slug = 'duplicate-test-' . uniqid();
 
         // Create first portfolio
-        $this->actingAs($this->superAdmin)->post('/admin/portfolios', $this->baseValidPayload([
+        $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $this->baseValidPayload([
             'name' => 'First Portfolio',
             'slug' => $slug,
             'full_name' => 'First Owner',
         ]));
 
         // Attempt second portfolio with identical slug
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $this->baseValidPayload([
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $this->baseValidPayload([
             'name' => 'Second Portfolio',
             'slug' => $slug,
             'full_name' => 'Second Owner',
@@ -193,7 +193,7 @@ class PortfolioCreationTest extends TestCase
 
     public function test_required_fields_validation(): void
     {
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', []);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', []);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['name', 'slug', 'full_name', 'nav_items']);
@@ -214,14 +214,14 @@ class PortfolioCreationTest extends TestCase
         );
 
         // First admin creates portfolio
-        $this->actingAs($this->superAdmin)->post('/admin/portfolios', $this->baseValidPayload([
+        $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $this->baseValidPayload([
             'name' => 'First Admin Portfolio',
             'slug' => $slug,
             'full_name' => 'First Owner',
         ]));
 
         // Second admin tries to use the same slug
-        $response = $this->actingAs($secondAdmin)->post('/admin/portfolios', $this->baseValidPayload([
+        $response = $this->actingAs($secondAdmin, 'super_admin')->post('/admin/portfolios', $this->baseValidPayload([
             'name' => 'Second Admin Portfolio',
             'slug' => $slug,
             'full_name' => 'Second Owner',
@@ -270,7 +270,7 @@ class PortfolioCreationTest extends TestCase
 
         $slug = 'nav-check-' . uniqid();
 
-        $this->actingAs($this->superAdmin)->post('/admin/portfolios', $this->baseValidPayload([
+        $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $this->baseValidPayload([
             'name' => 'Navbar Route Verification',
             'slug' => $slug,
             'full_name' => 'Nav Owner',
@@ -279,7 +279,7 @@ class PortfolioCreationTest extends TestCase
         $portfolio = Portfolio::where('slug', $slug)->firstOrFail();
 
         // Super Admin can store an additional nav item through existing route
-        $storeResponse = $this->actingAs($this->superAdmin)
+        $storeResponse = $this->actingAs($this->superAdmin, 'super_admin')
             ->from('/admin/dashboard')
             ->post("/admin/portfolios/{$portfolio->id}/nav-items", [
                 'label' => 'About',
@@ -324,7 +324,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasNoErrors();
@@ -354,7 +354,7 @@ class PortfolioCreationTest extends TestCase
 
         $payload = $this->baseValidPayload(['nav_items' => $navItems]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasNoErrors();
@@ -384,7 +384,7 @@ class PortfolioCreationTest extends TestCase
 
         $payload = $this->baseValidPayload(['nav_items' => $navItems]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items']);
@@ -404,7 +404,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items']);
@@ -431,7 +431,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items']);
@@ -458,7 +458,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items.1.sort_order']);
@@ -486,7 +486,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items.1']);
@@ -514,7 +514,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items.1.section_key']);
@@ -541,7 +541,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items.1.url']);
@@ -568,7 +568,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items.1.section_key']);
@@ -595,7 +595,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasErrors(['nav_items']);
@@ -629,7 +629,7 @@ class PortfolioCreationTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
         $response->assertSessionHasNoErrors();
@@ -647,7 +647,7 @@ class PortfolioCreationTest extends TestCase
 
         $payload = $this->baseValidPayload();
 
-        $response = $this->actingAs($inactiveAdmin)->post('/admin/portfolios', $payload);
+        $response = $this->actingAs($inactiveAdmin, 'super_admin')->post('/admin/portfolios', $payload);
 
         $response->assertStatus(403);
     }
@@ -656,12 +656,12 @@ class PortfolioCreationTest extends TestCase
     {
         // First portfolio created to reserve slug
         $existingSlug = 'duplicate-rehydrate-' . uniqid();
-        $this->actingAs($this->superAdmin)->post('/admin/portfolios', $this->baseValidPayload([
+        $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $this->baseValidPayload([
             'slug' => $existingSlug,
         ]));
 
         // Second portfolio attempt with identical slug and 3 navbar items
-        $response = $this->actingAs($this->superAdmin)
+        $response = $this->actingAs($this->superAdmin, 'super_admin')
             ->from('/admin/portfolios/create')
             ->post('/admin/portfolios', [
                 'name' => 'Duplicate Portfolio Test',
@@ -697,7 +697,7 @@ class PortfolioCreationTest extends TestCase
         $response->assertSessionHasErrors(['slug']);
 
         // Follow redirect to create page with session
-        $createPageResponse = $this->actingAs($this->superAdmin)
+        $createPageResponse = $this->actingAs($this->superAdmin, 'super_admin')
             ->get('/admin/portfolios/create');
 
         $createPageResponse->assertStatus(200);

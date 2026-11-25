@@ -76,12 +76,12 @@ class SubdomainRoutingTest extends TestCase
 
     public function test_admin_dashboard_works_on_localhost_and_is_blocked_on_subdomains(): void
     {
-        $this->actingAs($this->admin)
+        $this->actingAs($this->admin, 'super_admin')
             ->get('http://localhost/admin/dashboard')
             ->assertStatus(200)
             ->assertSee('Dashboard');
 
-        $this->actingAs($this->admin)
+        $this->actingAs($this->admin, 'super_admin')
             ->get('http://mahfuj.localhost/admin/dashboard')
             ->assertStatus(404);
     }
@@ -246,7 +246,7 @@ class SubdomainRoutingTest extends TestCase
 
     public function test_reserved_slug_is_rejected_in_creation_request_and_service(): void
     {
-        $response = $this->actingAs($this->admin)
+        $response = $this->actingAs($this->admin, 'super_admin')
             ->post('/admin/portfolios', [
                 'name' => 'Admin Spoof Portfolio',
                 'slug' => 'admin',
@@ -308,7 +308,7 @@ class SubdomainRoutingTest extends TestCase
         $this->get("http://{$slug}.localhost/")->assertStatus(404);
 
         // Authenticated active Super Admin sees Admin Preview Mode
-        $this->actingAs($this->admin)
+        $this->actingAs($this->admin, 'super_admin')
             ->get("http://{$slug}.localhost/")
             ->assertStatus(200)
             ->assertSee('Admin Preview Mode')

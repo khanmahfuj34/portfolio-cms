@@ -6,8 +6,12 @@
     @if (!empty($isPreview) && $isPreview)
         <div class="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-center text-xs font-medium text-amber-300 flex items-center justify-center gap-2 relative z-50">
             <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-            <span>Admin Preview Mode: This portfolio is currently in <strong>Draft</strong> and only visible to you as Super Admin.</span>
-            <a href="{{ route('admin.profiles.index') }}" class="underline hover:text-amber-100 ml-2">Back to dashboard</a>
+            <span>Admin Preview Mode: This portfolio is currently in <strong>Draft</strong> and is not publicly visible.</span>
+            @if (auth('super_admin')->user()?->isSuperAdmin())
+                <a href="{{ app(\App\Services\PortfolioDomainService::class)->baseUrlFor('/admin/profiles', request()) }}" class="underline hover:text-amber-100 ml-2">Back to dashboard</a>
+            @elseif (auth('admin')->user()?->isAdmin())
+                <a href="{{ app(\App\Services\PortfolioDomainService::class)->baseUrlFor('/dashboard/portfolios', request()) }}" class="underline hover:text-amber-100 ml-2">Back to dashboard</a>
+            @endif
         </div>
     @endif
 

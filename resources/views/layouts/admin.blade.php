@@ -87,16 +87,28 @@
          class="fixed inset-0 z-40 bg-[#14130F]/70 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200 lg:hidden"
          aria-hidden="true"></div>
 
+    @php
+        $currentUser = request()->routeIs('admin.*')
+            ? auth('super_admin')->user()
+            : (request()->routeIs('dashboard.*') ? auth('admin')->user() : auth()->user());
+        $isSuperAdmin = $currentUser?->isSuperAdmin() === true;
+        $workspaceHomeRoute = $isSuperAdmin ? route('admin.dashboard') : route('dashboard.index');
+        $workspaceLogoutRoute = $isSuperAdmin ? route('admin.logout') : route('logout');
+        $userInitials = $isSuperAdmin
+            ? 'SA'
+            : strtoupper(mb_substr(trim((string) ($currentUser?->name ?? 'AD')), 0, 2));
+    @endphp
+
     <!-- ========================================================================= -->
     <!-- Sidebar (Off-canvas on mobile, fixed left on desktop) -->
     <!-- ========================================================================= -->
     <aside id="admin-sidebar"
            class="fixed top-0 bottom-0 left-0 z-50 flex flex-col w-64 lg:w-72 bg-[#14130F] text-[#C9C3B6] border-r border-[#2A261C] transition-all duration-200 ease-out -translate-x-full lg:translate-x-0"
-           aria-label="Super Admin Navigation">
+           aria-label="{{ $isSuperAdmin ? 'Super Admin Navigation' : 'Creator Workspace Navigation' }}">
 
         <!-- Sidebar Brand / Header -->
         <div class="h-16 flex items-center justify-between px-5 border-b border-[#2A261C] flex-shrink-0">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brass rounded-md p-1">
+            <a href="{{ $workspaceHomeRoute }}" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-brass rounded-md p-1">
                 <!-- Monogram -->
                 <div class="w-8 h-8 rounded-md bg-brass flex items-center justify-center flex-shrink-0 text-[#14130F]">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -109,7 +121,7 @@
                         Portfolio CMS
                     </span>
                     <span class="text-[11px] text-[#8C877A]">
-                        Admin workspace
+                        {{ $isSuperAdmin ? 'Admin workspace' : 'Creator workspace' }}
                     </span>
                 </div>
             </a>
@@ -131,50 +143,78 @@
             <!-- Section: Main Menu -->
             <div>
                 <p class="sidebar-section-title px-3 mb-2 text-[11px] font-medium text-[#7C7668]">
-                    Core management
+                    {{ $isSuperAdmin ? 'Core management' : 'Workspace' }}
                 </p>
                 <nav class="space-y-0.5">
-                    <!-- 1. Dashboard -->
-                    <x-admin.nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard*')" title="Dashboard" class="sidebar-link-item">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                        </svg>
-                    </x-admin.nav-link>
+                    @if ($isSuperAdmin)
+                        <!-- 1. Dashboard -->
+                        <x-admin.nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard*')" title="Dashboard" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                        </x-admin.nav-link>
 
-                    <!-- 2. Portfolios -->
-                    <x-admin.nav-link :href="route('admin.portfolios.index')" :active="request()->routeIs('admin.portfolios.*')" title="Portfolios" class="sidebar-link-item">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                        </svg>
-                    </x-admin.nav-link>
+                        <!-- 2. Portfolios -->
+                        <x-admin.nav-link :href="route('admin.portfolios.index')" :active="request()->routeIs('admin.portfolios.*')" title="Portfolios" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </x-admin.nav-link>
 
-                    <!-- 3. Themes -->
-                    <x-admin.nav-link href="#themes" title="Themes" class="sidebar-link-item">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4 5 5 0 015-5h1a1 1 0 011 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 011-1h1a5 5 0 015 5 4 4 0 01-4 4H7zM16 3.13a4 4 0 010 7.75"/>
-                        </svg>
-                    </x-admin.nav-link>
+                        <!-- 3. Themes -->
+                        <x-admin.nav-link href="#themes" title="Themes" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4 5 5 0 015-5h1a1 1 0 011 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 011-1h1a5 5 0 015 5 4 4 0 01-4 4H7zM16 3.13a4 4 0 010 7.75"/>
+                            </svg>
+                        </x-admin.nav-link>
 
-                    <!-- 4. Profiles -->
-                    <x-admin.nav-link :href="route('admin.profiles.index')" :active="request()->routeIs('admin.profiles.*')" title="Profiles" class="sidebar-link-item">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                    </x-admin.nav-link>
+                        <!-- 4. Profiles -->
+                        <x-admin.nav-link :href="route('admin.profiles.index')" :active="request()->routeIs('admin.profiles.*')" title="Profiles" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </x-admin.nav-link>
 
-                    <!-- 5. Sections & Content -->
-                    <x-admin.nav-link href="#sections" title="Sections & Content" class="sidebar-link-item">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/>
-                        </svg>
-                    </x-admin.nav-link>
+                        <!-- 5. Users -->
+                        <x-admin.nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" title="Users" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </x-admin.nav-link>
 
-                    <!-- 6. Media Library -->
-                    <x-admin.nav-link href="#media" title="Media Library" class="sidebar-link-item">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                    </x-admin.nav-link>
+                        <!-- 5. Sections & Content -->
+                        <x-admin.nav-link href="#sections" title="Sections & Content" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/>
+                            </svg>
+                        </x-admin.nav-link>
+
+                        <!-- 6. Media Library -->
+                        <x-admin.nav-link href="#media" title="Media Library" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </x-admin.nav-link>
+                    @else
+                        <!-- Individual Admin Sidebar -->
+                        <x-admin.nav-link :href="route('dashboard.index')" :active="request()->routeIs('dashboard.index')" title="Dashboard" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                        </x-admin.nav-link>
+
+                        <x-admin.nav-link :href="route('dashboard.portfolios.index')" :active="request()->routeIs('dashboard.portfolios.*')" title="My Portfolios" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </x-admin.nav-link>
+
+                        <x-admin.nav-link :href="route('dashboard.account.edit')" :active="request()->routeIs('dashboard.account.*')" title="Account Settings" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </x-admin.nav-link>
+                    @endif
                 </nav>
             </div>
 
@@ -186,16 +226,16 @@
                 <div class="flex items-center gap-3 min-w-0">
                     <div class="relative flex-shrink-0">
                         <div class="w-8 h-8 rounded-md bg-[#221F17] text-brass font-medium text-xs flex items-center justify-center border border-[#3A3527]">
-                            SA
+                            {{ $userInitials }}
                         </div>
                         <span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-[#7FA46A] rounded-full ring-2 ring-[#14130F]" title="Online"></span>
                     </div>
                     <div class="sidebar-user-details min-w-0 flex-1">
                         <p class="text-xs font-medium text-[#EDE9DF] truncate">
-                            {{ auth()->user()->name ?? 'Super Admin' }}
+                            {{ $currentUser?->name ?? 'Super Admin' }}
                         </p>
                         <p class="text-[11px] text-[#8C877A] truncate">
-                            Super admin
+                            {{ $isSuperAdmin ? 'Super admin' : 'Admin account' }}
                         </p>
                     </div>
                 </div>
@@ -349,7 +389,7 @@
                             aria-haspopup="true"
                             aria-label="User account menu">
                         <div class="w-8 h-8 rounded-md bg-[#14130F] text-brass font-medium text-xs flex items-center justify-center">
-                            SA
+                            {{ $userInitials }}
                         </div>
                         <svg class="w-4 h-4 text-ink-mute hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -360,9 +400,9 @@
                     <div id="user-menu-dropdown"
                          class="hidden absolute right-0 mt-2 w-56 bg-surface rounded-xl shadow-sm border border-line py-2 z-50 transition-all duration-150">
                         <div class="px-4 py-2.5 border-b border-line">
-                            <p class="text-xs font-medium text-ink truncate">{{ auth()->user()->name ?? 'Super Admin' }}</p>
-                            <p class="text-[11px] text-ink-mute truncate">{{ auth()->user()->email ?? 'admin@portfoliocms.test' }}</p>
-                            <p class="text-[11px] text-ink-mute mt-1">Super administrator</p>
+                            <p class="text-xs font-medium text-ink truncate">{{ $currentUser?->name ?? 'Super Admin' }}</p>
+                            <p class="text-[11px] text-ink-mute truncate">{{ $currentUser?->email ?? 'admin@portfoliocms.test' }}</p>
+                            <p class="text-[11px] text-ink-mute mt-1">{{ $isSuperAdmin ? 'Super administrator' : 'Creator account' }}</p>
                         </div>
 
                         <div class="py-1">
@@ -442,8 +482,8 @@
 
     </div>
 
-    <!-- Hidden Super Admin Logout Form -->
-    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="hidden">
+    <!-- Hidden Workspace Logout Form -->
+    <form id="logout-form" action="{{ $workspaceLogoutRoute }}" method="POST" class="hidden">
         @csrf
     </form>
 

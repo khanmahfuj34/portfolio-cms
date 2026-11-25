@@ -21,8 +21,13 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p class="min-w-0 leading-relaxed text-ink-soft">
-            <span class="font-medium text-ink">Admin managed.</span>
-            Portfolio owners do not have login access. Profile data is edited here by the Super Admin.
+            @if (auth()->user()?->isSuperAdmin())
+                <span class="font-medium text-ink">Admin managed.</span>
+                Portfolio owners do not have login access. Profile data is edited here by the Super Admin.
+            @else
+                <span class="font-medium text-ink">Public portfolio profile.</span>
+                Update the public contact and biography details displayed on this portfolio.
+            @endif
         </p>
     </div>
 
@@ -31,6 +36,7 @@
             label="Owner full name"
             name="full_name"
             id="owner-fullname-input"
+            :value="isset($portfolio) ? $portfolio->profile?->full_name : null"
             placeholder="Individual or studio name"
             :required="true"
             helper="Displayed as the portfolio owner."
@@ -41,6 +47,7 @@
                 label="Professional title"
                 name="professional_title"
                 id="owner-title-input"
+                :value="isset($portfolio) ? $portfolio->profile?->professional_title : null"
                 placeholder="Principal architect"
                 helper="Headline or specialization."
             />
@@ -50,6 +57,7 @@
                 name="email"
                 type="email"
                 id="owner-email-input"
+                :value="isset($portfolio) ? $portfolio->profile?->email : null"
                 placeholder="contact@studio.com"
                 helper="Used for public inquiries."
             />
@@ -59,6 +67,7 @@
             label="Location"
             name="location"
             id="owner-location-input"
+            :value="isset($portfolio) ? $portfolio->profile?->location : null"
             placeholder="City, country"
             helper="Base city or remote availability."
         />
@@ -67,6 +76,7 @@
             label="Professional biography"
             name="bio"
             id="owner-bio-input"
+            :value="isset($portfolio) ? $portfolio->profile?->bio : null"
             rows="4"
             placeholder="Background, design philosophy, notable clients, accolades"
             maxlength="5000"

@@ -83,20 +83,20 @@ class PortfolioListingTest extends TestCase
             'is_active' => false,
         ]);
 
-        $response = $this->actingAs($inactiveAdmin)->get(route('admin.profiles.index'));
+        $response = $this->actingAs($inactiveAdmin, 'super_admin')->get(route('admin.profiles.index'));
         $response->assertStatus(403);
     }
 
     public function test_active_super_admin_can_view_profiles_and_portfolios_listing(): void
     {
-        $response = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index'));
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index'));
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.portfolios.index');
         $response->assertViewHas(['portfolios', 'stats']);
 
         // Portfolios alias route also renders the same listing
-        $responseAlias = $this->actingAs($this->superAdmin)->get(route('admin.portfolios.index'));
+        $responseAlias = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.portfolios.index'));
         $responseAlias->assertStatus(200);
         $responseAlias->assertViewIs('admin.portfolios.index');
     }
@@ -127,12 +127,12 @@ class PortfolioListingTest extends TestCase
         ];
 
         // 1. Submit creation
-        $createResponse = $this->actingAs($this->superAdmin)->post('/admin/portfolios', $payload);
+        $createResponse = $this->actingAs($this->superAdmin, 'super_admin')->post('/admin/portfolios', $payload);
         $createResponse->assertStatus(302);
         $createResponse->assertRedirect(route('admin.profiles.index'));
 
         // 2. Follow redirect to Profiles List
-        $listResponse = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index'));
+        $listResponse = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index'));
         $listResponse->assertStatus(200);
         $listResponse->assertSee('Instant Showcase Studio');
         $listResponse->assertSee('Tadao Ando');
@@ -152,7 +152,7 @@ class PortfolioListingTest extends TestCase
             3
         );
 
-        $response = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index'));
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Komorebi Architecture Studio');
@@ -169,7 +169,7 @@ class PortfolioListingTest extends TestCase
             ['full_name' => 'Soren Kierkegaard', 'professional_title' => 'Design Philosopher']
         );
 
-        $response = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['search' => 'Nordic Atelier']));
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['search' => 'Nordic Atelier']));
 
         $response->assertStatus(200);
         // Manage navigation link
@@ -189,7 +189,7 @@ class PortfolioListingTest extends TestCase
         DB::flushQueryLog();
         DB::enableQueryLog();
 
-        $response = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index'));
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index'));
 
         $response->assertStatus(200);
 
@@ -210,13 +210,13 @@ class PortfolioListingTest extends TestCase
         $portfolioB = $this->createPortfolio(['name' => 'Zenith Collective', 'slug' => $slugB]);
 
         // Search by name
-        $responseName = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['search' => 'Monolith Studios']));
+        $responseName = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['search' => 'Monolith Studios']));
         $responseName->assertStatus(200);
         $responseName->assertSee('Monolith Studios');
         $responseName->assertDontSee('Zenith Collective');
 
         // Search by slug
-        $responseSlug = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['search' => $slugB]));
+        $responseSlug = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['search' => $slugB]));
         $responseSlug->assertStatus(200);
         $responseSlug->assertSee('Zenith Collective');
         $responseSlug->assertDontSee('Monolith Studios');
@@ -246,17 +246,17 @@ class PortfolioListingTest extends TestCase
         );
 
         // Search by profile full name
-        $resName = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['search' => 'Elena Rostova']));
+        $resName = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['search' => 'Elena Rostova']));
         $resName->assertSee('Elena Rostova');
         $resName->assertDontSee('Julian Alvarez');
 
         // Search by profile professional title
-        $resTitle = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['search' => 'Computational Sculptor']));
+        $resTitle = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['search' => 'Computational Sculptor']));
         $resTitle->assertSee('Julian Alvarez');
         $resTitle->assertDontSee('Elena Rostova');
 
         // Search by profile email
-        $resEmail = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['search' => 'elena.' . $uniqueA]));
+        $resEmail = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['search' => 'elena.' . $uniqueA]));
         $resEmail->assertSee('Elena Rostova');
         $resEmail->assertDontSee('Julian Alvarez');
     }
@@ -268,13 +268,13 @@ class PortfolioListingTest extends TestCase
         $draft = $this->createPortfolio(['name' => 'Draft Co ' . $unique, 'status' => 'draft']);
 
         // Filter Published
-        $resPub = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['status' => 'published', 'search' => $unique]));
+        $resPub = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['status' => 'published', 'search' => $unique]));
         $resPub->assertStatus(200);
         $resPub->assertSee('Pub Co ' . $unique);
         $resPub->assertDontSee('Draft Co ' . $unique);
 
         // Filter Draft
-        $resDraft = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['status' => 'draft', 'search' => $unique]));
+        $resDraft = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['status' => 'draft', 'search' => $unique]));
         $resDraft->assertStatus(200);
         $resDraft->assertSee('Draft Co ' . $unique);
         $resDraft->assertDontSee('Pub Co ' . $unique);
@@ -289,7 +289,7 @@ class PortfolioListingTest extends TestCase
         }
 
         // Page 1
-        $resPage1 = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['search' => $uniqueTag]));
+        $resPage1 = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['search' => $uniqueTag]));
         $resPage1->assertStatus(200);
         $portfoliosPage1 = $resPage1->viewData('portfolios');
         $this->assertEquals(15, $portfoliosPage1->total());
@@ -297,7 +297,7 @@ class PortfolioListingTest extends TestCase
         $this->assertEquals(1, $portfoliosPage1->currentPage());
 
         // Page 2
-        $resPage2 = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', ['search' => $uniqueTag, 'page' => 2]));
+        $resPage2 = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', ['search' => $uniqueTag, 'page' => 2]));
         $resPage2->assertStatus(200);
         $portfoliosPage2 = $resPage2->viewData('portfolios');
         $this->assertEquals(15, $portfoliosPage2->total());
@@ -307,7 +307,7 @@ class PortfolioListingTest extends TestCase
 
     public function test_empty_state_rendered_when_no_portfolios_match(): void
     {
-        $response = $this->actingAs($this->superAdmin)->get(route('admin.profiles.index', [
+        $response = $this->actingAs($this->superAdmin, 'super_admin')->get(route('admin.profiles.index', [
             'search' => 'definitely_does_not_exist_' . uniqid(),
         ]));
 
@@ -325,7 +325,7 @@ class PortfolioListingTest extends TestCase
             3
         );
 
-        $response = $this->actingAs($this->superAdmin)
+        $response = $this->actingAs($this->superAdmin, 'super_admin')
             ->get(route('admin.portfolios.nav-items.index', $portfolio));
 
         $response->assertStatus(200);

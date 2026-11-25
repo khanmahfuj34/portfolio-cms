@@ -20,6 +20,7 @@
             label="Portfolio name"
             name="name"
             id="portfolio-name-input"
+            :value="$portfolio->name ?? null"
             placeholder="Studio name or showcase title"
             :required="true"
             helper="The public title shown for this portfolio."
@@ -30,6 +31,7 @@
                 label="Portfolio slug"
                 name="slug"
                 id="portfolio-slug-input"
+                :value="$portfolio->slug ?? null"
                 placeholder="minimalist-architecture"
                 :required="true"
                 helper="Lowercase letters, numbers, and hyphens only."
@@ -40,11 +42,11 @@
                 <div class="flex items-center gap-2 min-w-0">
                     <span class="text-[11px] text-ink-mute flex-shrink-0">URL</span>
                     <span class="font-mono text-ink-soft truncate">
-                        http://127.0.0.1:8000/<span id="slug-preview-display" class="text-brass-ink font-medium">{{ old('slug', 'your-slug') }}</span>
+                        http://127.0.0.1:8000/<span id="slug-preview-display" class="text-brass-ink font-medium">{{ old('slug', $portfolio->slug ?? 'your-slug') }}</span>
                     </span>
                 </div>
                 <span class="text-[11px] text-ink-mute self-start sm:self-auto flex-shrink-0">
-                    Auto-generated from name
+                    Subdomain: {slug}.{{ config('portfolio.base_domain', 'localhost') }}
                 </span>
             </div>
         </div>
@@ -53,6 +55,7 @@
             label="Short description"
             name="description"
             id="portfolio-description-input"
+            :value="$portfolio->description ?? null"
             rows="4"
             placeholder="A brief summary of this portfolio's purpose and theme"
             maxlength="5000"

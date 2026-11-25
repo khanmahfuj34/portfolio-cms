@@ -18,7 +18,10 @@
                         $technologies = is_array($project->technologies) ? array_filter($project->technologies, fn ($t) => is_string($t) && trim($t) !== '') : [];
                         $liveUrl = is_string($project->live_url) && preg_match('/^https?:\/\//i', trim($project->live_url)) ? trim($project->live_url) : null;
                         $githubUrl = is_string($project->github_url) && preg_match('/^https?:\/\//i', trim($project->github_url)) ? trim($project->github_url) : null;
-                        $thumbnail = is_string($project->thumbnail) && trim($project->thumbnail) !== '' ? trim($project->thumbnail) : null;
+                        $thumbnail = is_string($project->thumbnail)
+                            && preg_match('/^(?:https?:\/\/|\/(?!\/))/i', trim($project->thumbnail))
+                            ? trim($project->thumbnail)
+                            : null;
                     @endphp
 
                     <article class="group flex flex-col rounded-xl bg-[#131720] border border-white/10 hover:border-white/20 overflow-hidden transition-colors">

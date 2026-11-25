@@ -9,6 +9,7 @@ use App\Models\PortfolioProfile;
 use App\Services\PortfolioService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class PortfolioController extends Controller
@@ -72,6 +73,8 @@ class PortfolioController extends Controller
      */
     public function edit(Portfolio $portfolio): View
     {
+        Gate::authorize('update', $portfolio);
+
         $portfolio->load(['profile', 'navItems', 'skills', 'projects', 'primaryDomain']);
 
         return view('admin.portfolios.edit', compact('portfolio'));
@@ -129,6 +132,8 @@ class PortfolioController extends Controller
      */
     public function publish(Portfolio $portfolio): RedirectResponse
     {
+        Gate::authorize('publish', $portfolio);
+
         try {
             $this->portfolioService->publish($portfolio);
 
@@ -146,6 +151,8 @@ class PortfolioController extends Controller
      */
     public function unpublish(Portfolio $portfolio): RedirectResponse
     {
+        Gate::authorize('unpublish', $portfolio);
+
         try {
             $this->portfolioService->unpublish($portfolio);
 
@@ -163,6 +170,9 @@ class PortfolioController extends Controller
      */
     public function togglePublish(Portfolio $portfolio): RedirectResponse
     {
+        $ability = $portfolio->status === 'published' ? 'unpublish' : 'publish';
+        Gate::authorize($ability, $portfolio);
+
         try {
             $updated = $this->portfolioService->togglePublish($portfolio);
             $statusLabel = ucfirst($updated->status);

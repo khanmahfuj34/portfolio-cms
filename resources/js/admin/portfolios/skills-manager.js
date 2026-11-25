@@ -48,7 +48,7 @@ export function initSkillsManager() {
     // In-memory state for Form Mode
     let skillsState = [];
 
-    // Helper: Show notification banner
+    // Helper: Show notification banner using safe DOM APIs
     function showAlert(type, message) {
         if (!alertContainer) return;
         const isSuccess = type === 'success';
@@ -57,29 +57,46 @@ export function initSkillsManager() {
                 ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
                 : 'bg-[#FBF1EF] border border-[#E9D2CC] text-[#9C4A3E]'
         }`;
-        alertContainer.innerHTML = `
-            <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    ${isSuccess
-                        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />'
-                        : '<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'}
-                </svg>
-                <span>${escapeHtml(message)}</span>
-            </div>
-            <button type="button" class="text-xs opacity-60 hover:opacity-100 p-0.5" onclick="this.parentElement.classList.add('hidden')">&times;</button>
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex items-center gap-2';
+        wrapper.innerHTML = `
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                ${isSuccess
+                    ? '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />'
+                    : '<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'}
+            </svg>
         `;
+        const textSpan = document.createElement('span');
+        textSpan.textContent = message;
+        wrapper.appendChild(textSpan);
+
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'text-xs opacity-60 hover:opacity-100 p-0.5';
+        closeBtn.textContent = '\u00D7';
+        closeBtn.addEventListener('click', () => alertContainer.classList.add('hidden'));
+
+        alertContainer.replaceChildren(wrapper, closeBtn);
         alertContainer.classList.remove('hidden');
         setTimeout(() => {
             alertContainer.classList.add('hidden');
         }, 5000);
     }
 
-    // Helper: Sync hidden inputs for form submission
+    // Helper: Sync hidden inputs via DOM APIs (no HTML string interpolation)
     function syncHiddenInputs() {
         if (!isFormMode || !hiddenContainer) return;
-        hiddenContainer.innerHTML = skillsState.map((skill, idx) =>
-            `<input type="hidden" class="skill-hidden-name" name="skills[${idx}][name]" value="${escapeHtml(skill.name)}">`
-        ).join('');
+        const fragment = document.createDocumentFragment();
+        skillsState.forEach((skill, idx) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.className = 'skill-hidden-name';
+            input.name = `skills[${idx}][name]`;
+            input.value = String(skill.name ?? '');
+            fragment.appendChild(input);
+        });
+        hiddenContainer.replaceChildren(fragment);
     }
 
     // Helper: Update count display & empty state
@@ -88,45 +105,59 @@ export function initSkillsManager() {
             ? skillsState.length
             : (container ? container.querySelectorAll('.skill-item-chip').length : 0);
 
-        if (countDisplay) countDisplay.textContent = count;
+        if (countDisplay) countDisplay.textContent = String(count);
         if (counterBadge) {
-            counterBadge.innerHTML = `<span id="skills-count-display">${count}</span> ${count === 1 ? 'Skill' : 'Skills'}`;
+            const countSpan = document.createElement('span');
+            countSpan.id = 'skills-count-display';
+            countSpan.textContent = String(count);
+            counterBadge.replaceChildren(countSpan, document.createTextNode(` ${count === 1 ? 'Skill' : 'Skills'}`));
         }
 
         const emptyState = document.getElementById('skills-empty-state');
         if (count === 0 && !emptyState && container) {
-            container.innerHTML = `
-                <div id="skills-empty-state" class="w-full text-center py-8 px-4 rounded-lg border border-dashed border-line text-ink-mute">
-                    <p class="text-xs">No skills configured yet.</p>
-                    <p class="text-[11px] text-ink-mute/70 mt-1">Click "Add Skill" above to add your first skill.</p>
-                </div>
-            `;
+            const emptyBox = document.createElement('div');
+            emptyBox.id = 'skills-empty-state';
+            emptyBox.className = 'w-full text-center py-8 px-4 rounded-lg border border-dashed border-line text-ink-mute';
+            const titleP = document.createElement('p');
+            titleP.className = 'text-xs';
+            titleP.textContent = 'No skills configured yet.';
+            const hintP = document.createElement('p');
+            hintP.className = 'text-[11px] text-ink-mute/70 mt-1';
+            hintP.textContent = 'Click "Add Skill" above to add your first skill.';
+            emptyBox.replaceChildren(titleP, hintP);
+            container.replaceChildren(emptyBox);
         } else if (count > 0 && emptyState) {
             emptyState.remove();
         }
     }
 
-    // Helper: Create skill chip element
+    // Helper: Create skill chip element safely via DOM APIs
     function createSkillChipElement(skill) {
         const chip = document.createElement('div');
         chip.className = 'skill-item-chip inline-flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-lg border border-line bg-paper-sunk/40 hover:bg-paper-sunk text-ink text-xs transition-colors group';
-        chip.setAttribute('data-skill-id', skill.id);
-        chip.setAttribute('data-skill-name', skill.name);
-        chip.innerHTML = `
-            <span class="skill-name-text font-medium text-ink">${escapeHtml(skill.name)}</span>
-            <div class="flex items-center gap-1 border-l border-line/80 pl-1.5">
-                <button type="button" class="btn-edit-skill p-1 text-ink-mute hover:text-ink rounded transition-colors" title="Edit skill">
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                </button>
-                <button type="button" class="btn-delete-skill p-1 text-ink-mute hover:text-[#9C4A3E] rounded transition-colors" title="Delete skill">
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                </button>
-            </div>
+        chip.setAttribute('data-skill-id', String(skill.id));
+        chip.setAttribute('data-skill-name', String(skill.name));
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'skill-name-text font-medium text-ink';
+        nameSpan.textContent = String(skill.name);
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'flex items-center gap-1 border-l border-line/80 pl-1.5';
+        actionsDiv.innerHTML = `
+            <button type="button" class="btn-edit-skill p-1 text-ink-mute hover:text-ink rounded transition-colors" title="Edit skill">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+            </button>
+            <button type="button" class="btn-delete-skill p-1 text-ink-mute hover:text-[#9C4A3E] rounded transition-colors" title="Delete skill">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </button>
         `;
+
+        chip.replaceChildren(nameSpan, actionsDiv);
         return chip;
     }
 
@@ -506,9 +537,12 @@ export function initSkillsManager() {
     }
 
     function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        if (text === null || text === undefined) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 }

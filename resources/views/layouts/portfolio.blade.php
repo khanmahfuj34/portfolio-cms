@@ -3,6 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @if (!empty($isPreview) && $isPreview)
+        <meta name="referrer" content="no-referrer">
+        <meta name="robots" content="noindex, nofollow">
+    @endif
     <meta name="description" content="{{ Str::limit($profile?->bio ?? $portfolio->description ?? 'Professional Portfolio', 160) }}">
 
     <title>{{ $profile?->full_name ?? $portfolio->name }} | Portfolio</title>

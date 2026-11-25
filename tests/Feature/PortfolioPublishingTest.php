@@ -38,7 +38,7 @@ class PortfolioPublishingTest extends TestCase
             'published_at' => null,
         ]);
 
-        $response = $this->actingAs($this->admin)->patch(
+        $response = $this->actingAs($this->admin, 'super_admin')->patch(
             route('admin.portfolios.publish', $portfolio)
         );
 
@@ -60,7 +60,7 @@ class PortfolioPublishingTest extends TestCase
             'published_at' => now()->subDay(),
         ]);
 
-        $response = $this->actingAs($this->admin)->patch(
+        $response = $this->actingAs($this->admin, 'super_admin')->patch(
             route('admin.portfolios.unpublish', $portfolio)
         );
 
@@ -82,7 +82,7 @@ class PortfolioPublishingTest extends TestCase
             'published_at' => null,
         ]);
 
-        $this->actingAs($this->admin)->patch(
+        $this->actingAs($this->admin, 'super_admin')->patch(
             route('admin.portfolios.publish', $portfolio)
         );
 
@@ -101,7 +101,7 @@ class PortfolioPublishingTest extends TestCase
             'published_at' => now(),
         ]);
 
-        $this->actingAs($this->admin)->patch(
+        $this->actingAs($this->admin, 'super_admin')->patch(
             route('admin.portfolios.unpublish', $portfolio)
         );
 
@@ -147,7 +147,7 @@ class PortfolioPublishingTest extends TestCase
             'published_at' => null,
         ]);
 
-        $response = $this->actingAs($inactiveAdmin)->patch(
+        $response = $this->actingAs($inactiveAdmin, 'super_admin')->patch(
             route('admin.portfolios.publish', $portfolio)
         );
 
@@ -159,7 +159,7 @@ class PortfolioPublishingTest extends TestCase
 
     public function test_invalid_portfolio_id_returns_404(): void
     {
-        $response = $this->actingAs($this->admin)->patch(
+        $response = $this->actingAs($this->admin, 'super_admin')->patch(
             '/admin/portfolios/999999/publish'
         );
 
@@ -176,7 +176,7 @@ class PortfolioPublishingTest extends TestCase
             'published_at' => now(),
         ]);
 
-        $response = $this->actingAs($this->admin)->patch(
+        $response = $this->actingAs($this->admin, 'super_admin')->patch(
             route('admin.portfolios.publish', $portfolio)
         );
 
@@ -194,7 +194,7 @@ class PortfolioPublishingTest extends TestCase
             'published_at' => null,
         ]);
 
-        $response = $this->actingAs($this->admin)->patch(
+        $response = $this->actingAs($this->admin, 'super_admin')->patch(
             route('admin.portfolios.unpublish', $portfolio)
         );
 

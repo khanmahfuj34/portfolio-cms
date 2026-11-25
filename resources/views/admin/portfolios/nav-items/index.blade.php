@@ -4,6 +4,12 @@
 @section('page_title', 'Navigation')
 
 @section('content')
+@php
+    $isDashboard = request()->routeIs('dashboard.*');
+    $routePrefix = $isDashboard ? 'dashboard' : 'admin';
+    $homeRoute = $isDashboard ? route('dashboard.index') : route('admin.dashboard');
+    $listRoute = $isDashboard ? route('dashboard.portfolios.index') : route('admin.profiles.index');
+@endphp
 <div class="space-y-6">
 
     <!-- Header -->
@@ -11,9 +17,9 @@
         <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div class="space-y-1.5">
                 <div class="flex items-center gap-2 text-[11px] text-ink-mute flex-wrap">
-                    <a href="{{ route('admin.dashboard') }}" class="hover:text-ink transition-colors">Admin</a>
+                    <a href="{{ $homeRoute }}" class="hover:text-ink transition-colors">{{ $isDashboard ? 'Dashboard' : 'Admin' }}</a>
                     <span class="text-line-strong">/</span>
-                    <a href="{{ route('admin.profiles.index') }}" class="hover:text-ink transition-colors">Profiles</a>
+                    <a href="{{ $listRoute }}" class="hover:text-ink transition-colors">{{ $isDashboard ? 'My Portfolios' : 'Profiles' }}</a>
                     <span class="text-line-strong">/</span>
                     <span class="text-ink-soft truncate max-w-[150px] sm:max-w-xs">{{ $portfolio->name }}</span>
                     <span class="text-line-strong">/</span>
@@ -29,14 +35,14 @@
             </div>
 
             <div class="flex items-center gap-2 flex-shrink-0">
-                <a href="{{ route('admin.profiles.index') }}"
+                <a href="{{ $listRoute }}"
                    class="px-3.5 py-2 rounded-lg text-xs font-medium text-ink-soft bg-surface border border-line hover:bg-paper-sunk transition-colors inline-flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5 text-ink-mute" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
                     <span>Back</span>
                 </a>
-                <a href="{{ url('/' . $portfolio->slug) }}"
+                <a href="{{ $isDashboard && $portfolio->status === 'draft' ? route('dashboard.portfolios.preview', $portfolio) : ($portfolio->primaryDomain ? app(\App\Services\PortfolioDomainService::class)->publicUrlFor($portfolio->primaryDomain, request()) : url('/' . $portfolio->slug)) }}"
                    target="_blank"
                    rel="noopener noreferrer"
                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium bg-brass text-[#14130F] hover:bg-[#B89149] transition-colors">
@@ -78,7 +84,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('admin.portfolios.nav-items.store', $portfolio) }}" class="space-y-4">
+                <form method="POST" action="{{ route($routePrefix . '.portfolios.nav-items.store', $portfolio) }}" class="space-y-4">
                     @csrf
 
                     <div>
@@ -247,7 +253,7 @@
                                     </td>
 
                                     <td class="py-3 px-3">
-                                        <form method="POST" action="{{ route('admin.portfolios.nav-items.visibility', [$portfolio, $item->id]) }}">
+                                        <form method="POST" action="{{ route($routePrefix . '.portfolios.nav-items.visibility', [$portfolio, $item->id]) }}">
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit"
@@ -270,7 +276,9 @@
                                                 </svg>
                                             </button>
 
-                                            <form method="POST" action="{{ route('admin.portfolios.nav-items.destroy', [$portfolio, $item->id]) }}" onsubmit="return confirm('Delete navigation link \'{{ $item->label }}\'?');">
+                                            <form method="POST"
+                                                  action="{{ route($routePrefix . '.portfolios.nav-items.destroy', [$portfolio, $item->id]) }}"
+                                                  data-confirm="Delete navigation link '{{ $item->label }}'?">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit"
@@ -287,7 +295,7 @@
 
                                 <tr id="edit_row_{{ $item->id }}" class="hidden bg-paper-sunk border-t border-b border-brass/30">
                                     <td colspan="5" class="p-4">
-                                        <form method="POST" action="{{ route('admin.portfolios.nav-items.update', [$portfolio, $item->id]) }}" class="space-y-3">
+                                        <form method="POST" action="{{ route($routePrefix . '.portfolios.nav-items.update', [$portfolio, $item->id]) }}" class="space-y-3">
                                             @csrf
                                             @method('PUT')
 

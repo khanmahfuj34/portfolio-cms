@@ -50,7 +50,19 @@ export function initProjectsManager() {
     // In-memory state for Form Mode
     let projectsState = [];
 
-    // Helper: Show banner alert
+    function safeHttpUrl(value) {
+        if (typeof value !== 'string') return null;
+        const trimmed = value.trim();
+        return /^https?:\/\//i.test(trimmed) ? trimmed : null;
+    }
+
+    function safeThumbnailUrl(value) {
+        if (typeof value !== 'string') return null;
+        const trimmed = value.trim();
+        return /^(?:https?:\/\/|\/(?!\/))/i.test(trimmed) ? trimmed : null;
+    }
+
+    // Helper: Show banner alert safely via DOM APIs
     function showAlert(type, message) {
         if (!alertContainer) return;
         const isSuccess = type === 'success';
@@ -59,44 +71,60 @@ export function initProjectsManager() {
                 ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
                 : 'bg-[#FBF1EF] border border-[#E9D2CC] text-[#9C4A3E]'
         }`;
-        alertContainer.innerHTML = `
-            <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    ${isSuccess
-                        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />'
-                        : '<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'}
-                </svg>
-                <span>${escapeHtml(message)}</span>
-            </div>
-            <button type="button" class="text-xs opacity-60 hover:opacity-100 p-0.5" onclick="this.parentElement.classList.add('hidden')">&times;</button>
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex items-center gap-2';
+        wrapper.innerHTML = `
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                ${isSuccess
+                    ? '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />'
+                    : '<path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'}
+            </svg>
         `;
+        const msgSpan = document.createElement('span');
+        msgSpan.textContent = message;
+        wrapper.appendChild(msgSpan);
+
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'text-xs opacity-60 hover:opacity-100 p-0.5';
+        closeBtn.textContent = '\u00D7';
+        closeBtn.addEventListener('click', () => alertContainer.classList.add('hidden'));
+
+        alertContainer.replaceChildren(wrapper, closeBtn);
         alertContainer.classList.remove('hidden');
         setTimeout(() => {
             alertContainer.classList.add('hidden');
         }, 5000);
     }
 
-    // Helper: Sync hidden inputs for form submission
+    // Helper: Sync hidden inputs via DOM APIs (no HTML string interpolation)
     function syncHiddenInputs() {
         if (!isFormMode || !hiddenContainer) return;
-        hiddenContainer.innerHTML = projectsState.map((proj, idx) => {
-            const techs = Array.isArray(proj.technologies) ? proj.technologies : [];
-            const techInputs = techs.map(t =>
-                `<input type="hidden" name="projects[${idx}][technologies][]" value="${escapeHtml(t)}">`
-            ).join('');
+        const fragment = document.createDocumentFragment();
+        const appendHidden = (name, value) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = String(value ?? '');
+            fragment.appendChild(input);
+        };
 
-            return `
-                <input type="hidden" name="projects[${idx}][title]" value="${escapeHtml(proj.title)}">
-                <input type="hidden" name="projects[${idx}][description]" value="${escapeHtml(proj.description || '')}">
-                <input type="hidden" name="projects[${idx}][thumbnail]" value="${escapeHtml(proj.thumbnail || '')}">
-                <input type="hidden" name="projects[${idx}][live_url]" value="${escapeHtml(proj.live_url || '')}">
-                <input type="hidden" name="projects[${idx}][github_url]" value="${escapeHtml(proj.github_url || '')}">
-                <input type="hidden" name="projects[${idx}][sort_order]" value="${proj.sort_order ?? idx}">
-                <input type="hidden" name="projects[${idx}][is_featured]" value="${proj.is_featured ? '1' : '0'}">
-                <input type="hidden" name="projects[${idx}][is_visible]" value="${proj.is_visible ? '1' : '0'}">
-                ${techInputs}
-            `;
-        }).join('');
+        projectsState.forEach((proj, idx) => {
+            appendHidden(`projects[${idx}][title]`, proj.title);
+            appendHidden(`projects[${idx}][description]`, proj.description || '');
+            appendHidden(`projects[${idx}][thumbnail]`, proj.thumbnail || '');
+            appendHidden(`projects[${idx}][live_url]`, proj.live_url || '');
+            appendHidden(`projects[${idx}][github_url]`, proj.github_url || '');
+            appendHidden(`projects[${idx}][sort_order]`, proj.sort_order ?? idx);
+            appendHidden(`projects[${idx}][is_featured]`, proj.is_featured ? '1' : '0');
+            appendHidden(`projects[${idx}][is_visible]`, proj.is_visible ? '1' : '0');
+
+            const techs = Array.isArray(proj.technologies) ? proj.technologies : [];
+            techs.forEach((t) => appendHidden(`projects[${idx}][technologies][]`, t));
+        });
+
+        hiddenContainer.replaceChildren(fragment);
     }
 
     // Helper: Update count & empty state
@@ -105,19 +133,27 @@ export function initProjectsManager() {
             ? projectsState.length
             : (container ? container.querySelectorAll('.project-item-card').length : 0);
 
-        if (countDisplay) countDisplay.textContent = count;
+        if (countDisplay) countDisplay.textContent = String(count);
         if (counterBadge) {
-            counterBadge.innerHTML = `<span id="projects-count-display">${count}</span> ${count === 1 ? 'Project' : 'Projects'}`;
+            const countSpan = document.createElement('span');
+            countSpan.id = 'projects-count-display';
+            countSpan.textContent = String(count);
+            counterBadge.replaceChildren(countSpan, document.createTextNode(` ${count === 1 ? 'Project' : 'Projects'}`));
         }
 
         const emptyState = document.getElementById('projects-empty-state');
         if (count === 0 && !emptyState && container) {
-            container.innerHTML = `
-                <div id="projects-empty-state" class="w-full text-center py-8 px-4 rounded-lg border border-dashed border-line text-ink-mute">
-                    <p class="text-xs">No projects configured yet.</p>
-                    <p class="text-[11px] text-ink-mute/70 mt-1">Click "Add Project" above to create your first portfolio project.</p>
-                </div>
-            `;
+            const emptyBox = document.createElement('div');
+            emptyBox.id = 'projects-empty-state';
+            emptyBox.className = 'w-full text-center py-8 px-4 rounded-lg border border-dashed border-line text-ink-mute';
+            const titleP = document.createElement('p');
+            titleP.className = 'text-xs';
+            titleP.textContent = 'No projects configured yet.';
+            const hintP = document.createElement('p');
+            hintP.className = 'text-[11px] text-ink-mute/70 mt-1';
+            hintP.textContent = 'Click "Add Project" above to create your first portfolio project.';
+            emptyBox.replaceChildren(titleP, hintP);
+            container.replaceChildren(emptyBox);
         } else if (count > 0 && emptyState) {
             emptyState.remove();
         }
@@ -133,93 +169,156 @@ export function initProjectsManager() {
         modalEl.classList.add('hidden');
     }
 
-    // Helper: Render project card DOM element
+    // Helper: Render project card safely using DOM APIs
     function renderProjectCard(project) {
-        const technologies = Array.isArray(project.technologies) ? project.technologies : [];
-        const techHtml = technologies.length > 0
-            ? technologies.map(t => `<span class="px-2 py-0.5 rounded bg-surface border border-line text-ink-soft text-[11px] font-mono">${escapeHtml(t)}</span>`).join('')
-            : '<span class="text-ink-mute/70 italic">No technologies listed</span>';
-
-        const liveHtml = project.live_url
-            ? `<a href="${escapeHtml(project.live_url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-brass-ink hover:underline">
-                 <span>Live preview</span>
-                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                 </svg>
-               </a>`
-            : '';
-
-        const githubHtml = project.github_url
-            ? `<a href="${escapeHtml(project.github_url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-ink-soft hover:text-ink hover:underline">
-                 <span>Repository</span>
-                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                 </svg>
-               </a>`
-            : '';
-
-        const thumbHtml = project.thumbnail
-            ? `<img src="${escapeHtml(project.thumbnail)}" alt="${escapeHtml(project.title)}" class="w-12 h-12 rounded-md object-cover border border-line flex-shrink-0 bg-surface">`
-            : `<div class="w-10 h-10 rounded-md bg-surface border border-line flex items-center justify-center flex-shrink-0 text-ink-mute">
-                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                 </svg>
-               </div>`;
-
         const card = document.createElement('div');
         card.className = 'project-item-card rounded-lg border border-line bg-paper-sunk/40 hover:bg-paper-sunk/60 p-4 transition-colors space-y-3';
-        card.setAttribute('data-project-id', project.id);
+        card.setAttribute('data-project-id', String(project.id));
         card.setAttribute('data-project-data', JSON.stringify(project));
 
-        card.innerHTML = `
-            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-line">
-                <div class="flex items-start gap-3 min-w-0">
-                    ${thumbHtml}
-                    <div class="min-w-0 space-y-1">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h4 class="project-title-display text-xs sm:text-sm font-semibold text-ink truncate">
-                                ${escapeHtml(project.title)}
-                            </h4>
-                            ${project.is_featured ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-brass-wash text-brass-ink border border-brass/30">Featured</span>' : ''}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${project.is_visible ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
-                                ${project.is_visible ? 'Visible' : 'Hidden'}
-                            </span>
-                            <span class="text-[10px] text-ink-mute font-mono">Order: ${project.sort_order ?? 0}</span>
-                        </div>
-                        ${project.description ? `<p class="text-xs text-ink-soft line-clamp-2 leading-relaxed">${escapeHtml(project.description)}</p>` : ''}
-                    </div>
-                </div>
+        const topRow = document.createElement('div');
+        topRow.className = 'flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-line';
 
-                <div class="flex items-center gap-1.5 self-end sm:self-start flex-shrink-0">
-                    <button type="button"
-                            class="btn-edit-project inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-ink-soft hover:text-ink bg-surface border border-line hover:bg-paper-sunk rounded-md transition-colors"
-                            title="Edit project">
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                        </svg>
-                        <span>Edit</span>
-                    </button>
-                    <button type="button"
-                            class="btn-delete-project inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#9C4A3E] hover:bg-[#FBF1EF] border border-[#E9D2CC] rounded-md transition-colors"
-                            title="Delete project">
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                        <span>Delete</span>
-                    </button>
-                </div>
-            </div>
+        const leftInfo = document.createElement('div');
+        leftInfo.className = 'flex items-start gap-3 min-w-0';
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[11px] text-ink-mute">
-                <div class="flex flex-wrap gap-1.5 items-center">
-                    ${techHtml}
-                </div>
-                <div class="flex items-center gap-3">
-                    ${liveHtml}
-                    ${githubHtml}
-                </div>
-            </div>
+        const validThumb = safeThumbnailUrl(project.thumbnail);
+        if (validThumb) {
+            const img = document.createElement('img');
+            img.src = validThumb;
+            img.alt = String(project.title ?? '');
+            img.className = 'w-12 h-12 rounded-md object-cover border border-line flex-shrink-0 bg-surface';
+            leftInfo.appendChild(img);
+        } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'w-10 h-10 rounded-md bg-surface border border-line flex items-center justify-center flex-shrink-0 text-ink-mute';
+            placeholder.innerHTML = `
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            `;
+            leftInfo.appendChild(placeholder);
+        }
+
+        const textWrap = document.createElement('div');
+        textWrap.className = 'min-w-0 space-y-1';
+
+        const headingRow = document.createElement('div');
+        headingRow.className = 'flex items-center gap-2 flex-wrap';
+
+        const titleEl = document.createElement('h4');
+        titleEl.className = 'project-title-display text-xs sm:text-sm font-semibold text-ink truncate';
+        titleEl.textContent = String(project.title ?? '');
+        headingRow.appendChild(titleEl);
+
+        if (project.is_featured) {
+            const featuredBadge = document.createElement('span');
+            featuredBadge.className = 'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-brass-wash text-brass-ink border border-brass/30';
+            featuredBadge.textContent = 'Featured';
+            headingRow.appendChild(featuredBadge);
+        }
+
+        const visibilityBadge = document.createElement('span');
+        visibilityBadge.className = `inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium ${project.is_visible ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}`;
+        visibilityBadge.textContent = project.is_visible ? 'Visible' : 'Hidden';
+        headingRow.appendChild(visibilityBadge);
+
+        const orderBadge = document.createElement('span');
+        orderBadge.className = 'text-[10px] text-ink-mute font-mono';
+        orderBadge.textContent = `Order: ${Number.isFinite(Number(project.sort_order)) ? Number(project.sort_order) : 0}`;
+        headingRow.appendChild(orderBadge);
+
+        textWrap.appendChild(headingRow);
+
+        if (project.description) {
+            const descP = document.createElement('p');
+            descP.className = 'text-xs text-ink-soft line-clamp-2 leading-relaxed';
+            descP.textContent = String(project.description);
+            textWrap.appendChild(descP);
+        }
+
+        leftInfo.appendChild(textWrap);
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'flex items-center gap-1.5 self-end sm:self-start flex-shrink-0';
+        actionsDiv.innerHTML = `
+            <button type="button"
+                    class="btn-edit-project inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-ink-soft hover:text-ink bg-surface border border-line hover:bg-paper-sunk rounded-md transition-colors"
+                    title="Edit project">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+                <span>Edit</span>
+            </button>
+            <button type="button"
+                    class="btn-delete-project inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[#9C4A3E] hover:bg-[#FBF1EF] border border-[#E9D2CC] rounded-md transition-colors"
+                    title="Delete project">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                <span>Delete</span>
+            </button>
         `;
+
+        topRow.replaceChildren(leftInfo, actionsDiv);
+
+        const bottomRow = document.createElement('div');
+        bottomRow.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[11px] text-ink-mute';
+
+        const techContainer = document.createElement('div');
+        techContainer.className = 'flex flex-wrap gap-1.5 items-center';
+        const technologies = Array.isArray(project.technologies) ? project.technologies : [];
+        if (technologies.length > 0) {
+            technologies.forEach((tech) => {
+                const techSpan = document.createElement('span');
+                techSpan.className = 'px-2 py-0.5 rounded bg-surface border border-line text-ink-soft text-[11px] font-mono';
+                techSpan.textContent = String(tech);
+                techContainer.appendChild(techSpan);
+            });
+        } else {
+            const noneSpan = document.createElement('span');
+            noneSpan.className = 'text-ink-mute/70 italic';
+            noneSpan.textContent = 'No technologies listed';
+            techContainer.appendChild(noneSpan);
+        }
+
+        const linksContainer = document.createElement('div');
+        linksContainer.className = 'flex items-center gap-3';
+
+        const validLiveUrl = safeHttpUrl(project.live_url);
+        if (validLiveUrl) {
+            const liveLink = document.createElement('a');
+            liveLink.href = validLiveUrl;
+            liveLink.target = '_blank';
+            liveLink.rel = 'noopener noreferrer';
+            liveLink.className = 'inline-flex items-center gap-1 text-brass-ink hover:underline';
+            liveLink.innerHTML = `
+                <span>Live preview</span>
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+            `;
+            linksContainer.appendChild(liveLink);
+        }
+
+        const validGithubUrl = safeHttpUrl(project.github_url);
+        if (validGithubUrl) {
+            const githubLink = document.createElement('a');
+            githubLink.href = validGithubUrl;
+            githubLink.target = '_blank';
+            githubLink.rel = 'noopener noreferrer';
+            githubLink.className = 'inline-flex items-center gap-1 text-ink-soft hover:text-ink hover:underline';
+            githubLink.innerHTML = `
+                <span>Repository</span>
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+            `;
+            linksContainer.appendChild(githubLink);
+        }
+
+        bottomRow.replaceChildren(techContainer, linksContainer);
+        card.replaceChildren(topRow, bottomRow);
 
         return card;
     }
@@ -426,15 +525,21 @@ export function initProjectsManager() {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    let errHtml = '';
-                    if (data.errors) {
-                        const errList = Object.values(data.errors).flat();
-                        errHtml = `<ul class="list-disc list-inside space-y-0.5">${errList.map(e => `<li>${escapeHtml(e)}</li>`).join('')}</ul>`;
-                    } else {
-                        errHtml = `<p>${escapeHtml(data.message || 'Failed to save project.')}</p>`;
-                    }
                     if (modalError) {
-                        modalError.innerHTML = errHtml;
+                        if (data.errors) {
+                            const ul = document.createElement('ul');
+                            ul.className = 'list-disc list-inside space-y-0.5';
+                            Object.values(data.errors).flat().forEach((errMsg) => {
+                                const li = document.createElement('li');
+                                li.textContent = String(errMsg);
+                                ul.appendChild(li);
+                            });
+                            modalError.replaceChildren(ul);
+                        } else {
+                            const p = document.createElement('p');
+                            p.textContent = String(data.message || 'Failed to save project.');
+                            modalError.replaceChildren(p);
+                        }
                         modalError.classList.remove('hidden');
                     }
                     return;
@@ -529,9 +634,12 @@ export function initProjectsManager() {
     }
 
     function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        if (text === null || text === undefined) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 }

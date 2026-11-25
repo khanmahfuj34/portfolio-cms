@@ -13,12 +13,14 @@
                     <h3 class="text-sm font-medium text-ink">
                         {{ auth()->user()->name ?? 'Super Administrator' }}
                     </h3>
-                    <span class="text-[11px] text-brass-ink bg-brass-wash px-1.5 py-0.5 rounded">Super admin</span>
+                    <span class="text-[11px] text-brass-ink bg-brass-wash px-1.5 py-0.5 rounded">
+                        {{ auth()->user()?->isSuperAdmin() ? 'Super admin' : 'Creator account' }}
+                    </span>
                 </div>
                 <p class="text-[11px] text-ink-mute mt-0.5">
                     <span class="font-mono">{{ auth()->user()->email ?? 'admin@portfoliocms.test' }}</span>
                     <span class="mx-1.5 text-line-strong">·</span>
-                    Assigned Administrator
+                    {{ auth()->user()?->isSuperAdmin() ? 'Assigned Administrator' : 'Portfolio Owner' }}
                 </p>
             </div>
         </div>

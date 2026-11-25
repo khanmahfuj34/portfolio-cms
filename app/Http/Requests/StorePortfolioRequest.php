@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Portfolio;
 use App\Models\PortfolioDomain;
 use App\Services\PortfolioDomainService;
 use Illuminate\Foundation\Http\FormRequest;
@@ -12,11 +13,11 @@ use InvalidArgumentException;
 class StorePortfolioRequest extends FormRequest
 {
     /**
-     * Authorize only active Super Admin users.
+     * Authorize Super Admin or Individual Admin via PortfolioPolicy.
      */
     public function authorize(): bool
     {
-        return $this->user()?->isSuperAdmin() === true;
+        return $this->user()?->can('create', Portfolio::class) === true;
     }
 
     /**
@@ -212,15 +213,16 @@ class StorePortfolioRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:255',
+                'regex:/^(?:https?:\/\/|\/(?!\/))/i',
             ],
             'projects.*.live_url' => [
                 'nullable',
-                'url',
+                'url:http,https',
                 'max:255',
             ],
             'projects.*.github_url' => [
                 'nullable',
-                'url',
+                'url:http,https',
                 'max:255',
             ],
             'projects.*.technologies' => [

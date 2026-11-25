@@ -1,4 +1,5 @@
 @php
+    $routePrefix = $routePrefix ?? (request()->routeIs('dashboard.*') ? 'dashboard' : 'admin');
     $portfolioId = isset($portfolio) && $portfolio->exists ? $portfolio->id : null;
     $oldProjects = old('projects');
     if (is_array($oldProjects)) {
@@ -30,7 +31,7 @@
 <div id="projects-configuration-section"
      class="rounded-xl bg-surface border border-line p-6 sm:p-7 space-y-6"
      data-portfolio-id="{{ $portfolioId ?? '' }}"
-     data-projects-url="{{ $portfolioId ? route('admin.portfolios.projects.index', $portfolio) : '' }}">
+     data-projects-url="{{ $portfolioId ? route($routePrefix . '.portfolios.projects.index', $portfolio) : '' }}">
 
     <!-- Hidden form inputs container for create/edit form submissions -->
     <div id="projects-hidden-inputs">

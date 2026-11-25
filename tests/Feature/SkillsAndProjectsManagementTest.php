@@ -61,7 +61,7 @@ class SkillsAndProjectsManagementTest extends TestCase
             'name' => 'Laravel',
         ]);
 
-        $response = $this->actingAs($this->admin)
+        $response = $this->actingAs($this->admin, 'super_admin')
             ->getJson("/admin/portfolios/{$this->portfolio->id}/skills");
 
         $response->assertStatus(200);
@@ -74,7 +74,7 @@ class SkillsAndProjectsManagementTest extends TestCase
     public function test_super_admin_can_create_update_and_delete_skill(): void
     {
         // 1. Create
-        $createRes = $this->actingAs($this->admin)
+        $createRes = $this->actingAs($this->admin, 'super_admin')
             ->postJson("/admin/portfolios/{$this->portfolio->id}/skills", [
                 'name' => 'TypeScript',
             ]);
@@ -91,14 +91,14 @@ class SkillsAndProjectsManagementTest extends TestCase
         ]);
 
         // 2. Reject duplicate skill name in same portfolio
-        $dupRes = $this->actingAs($this->admin)
+        $dupRes = $this->actingAs($this->admin, 'super_admin')
             ->postJson("/admin/portfolios/{$this->portfolio->id}/skills", [
                 'name' => 'TypeScript',
             ]);
         $dupRes->assertStatus(422);
 
         // 3. Update
-        $updateRes = $this->actingAs($this->admin)
+        $updateRes = $this->actingAs($this->admin, 'super_admin')
             ->putJson("/admin/portfolios/{$this->portfolio->id}/skills/{$skillId}", [
                 'name' => 'TypeScript & React',
             ]);
@@ -111,7 +111,7 @@ class SkillsAndProjectsManagementTest extends TestCase
         ]);
 
         // 4. Delete
-        $deleteRes = $this->actingAs($this->admin)
+        $deleteRes = $this->actingAs($this->admin, 'super_admin')
             ->deleteJson("/admin/portfolios/{$this->portfolio->id}/skills/{$skillId}");
 
         $deleteRes->assertStatus(200);
@@ -136,7 +136,7 @@ class SkillsAndProjectsManagementTest extends TestCase
             'sort_order' => 1,
         ];
 
-        $createRes = $this->actingAs($this->admin)
+        $createRes = $this->actingAs($this->admin, 'super_admin')
             ->postJson("/admin/portfolios/{$this->portfolio->id}/projects", $payload);
 
         $createRes->assertStatus(201);
@@ -153,14 +153,14 @@ class SkillsAndProjectsManagementTest extends TestCase
         ]);
 
         // 2. Reject missing title
-        $invalidRes = $this->actingAs($this->admin)
+        $invalidRes = $this->actingAs($this->admin, 'super_admin')
             ->postJson("/admin/portfolios/{$this->portfolio->id}/projects", [
                 'title' => '',
             ]);
         $invalidRes->assertStatus(422);
 
         // 3. Update
-        $updateRes = $this->actingAs($this->admin)
+        $updateRes = $this->actingAs($this->admin, 'super_admin')
             ->putJson("/admin/portfolios/{$this->portfolio->id}/projects/{$projectId}", [
                 'title' => 'Updated Cloud Orchestrator v2',
                 'technologies' => ['Laravel', 'Kubernetes'],
@@ -176,7 +176,7 @@ class SkillsAndProjectsManagementTest extends TestCase
         ]);
 
         // 4. Delete
-        $deleteRes = $this->actingAs($this->admin)
+        $deleteRes = $this->actingAs($this->admin, 'super_admin')
             ->deleteJson("/admin/portfolios/{$this->portfolio->id}/projects/{$projectId}");
 
         $deleteRes->assertStatus(200);
@@ -206,19 +206,19 @@ class SkillsAndProjectsManagementTest extends TestCase
         ]);
 
         // Scoped bindings prevent cross-portfolio access
-        $this->actingAs($this->admin)
+        $this->actingAs($this->admin, 'super_admin')
             ->putJson("/admin/portfolios/{$this->portfolio->id}/skills/{$otherSkill->id}", ['name' => 'Hacked'])
             ->assertStatus(404);
 
-        $this->actingAs($this->admin)
+        $this->actingAs($this->admin, 'super_admin')
             ->deleteJson("/admin/portfolios/{$this->portfolio->id}/skills/{$otherSkill->id}")
             ->assertStatus(404);
 
-        $this->actingAs($this->admin)
+        $this->actingAs($this->admin, 'super_admin')
             ->putJson("/admin/portfolios/{$this->portfolio->id}/projects/{$otherProject->id}", ['title' => 'Hacked'])
             ->assertStatus(404);
 
-        $this->actingAs($this->admin)
+        $this->actingAs($this->admin, 'super_admin')
             ->deleteJson("/admin/portfolios/{$this->portfolio->id}/projects/{$otherProject->id}")
             ->assertStatus(404);
     }
@@ -236,7 +236,7 @@ class SkillsAndProjectsManagementTest extends TestCase
             'technologies' => ['Terraform', 'AWS'],
         ]);
 
-        $response = $this->actingAs($this->admin)
+        $response = $this->actingAs($this->admin, 'super_admin')
             ->get("/admin/portfolios/{$this->portfolio->id}/edit");
 
         $response->assertStatus(200);
@@ -249,7 +249,7 @@ class SkillsAndProjectsManagementTest extends TestCase
 
     public function test_create_portfolio_view_contains_skills_and_projects_sections(): void
     {
-        $response = $this->actingAs($this->admin)
+        $response = $this->actingAs($this->admin, 'super_admin')
             ->get('/admin/portfolios/create');
 
         $response->assertStatus(200);
@@ -323,7 +323,7 @@ class SkillsAndProjectsManagementTest extends TestCase
             ],
         ];
 
-        $response = $this->actingAs($this->admin)
+        $response = $this->actingAs($this->admin, 'super_admin')
             ->post('/admin/portfolios', $payload);
 
         $response->assertStatus(302);
@@ -377,7 +377,7 @@ class SkillsAndProjectsManagementTest extends TestCase
             ],
         ];
 
-        $response = $this->actingAs($this->admin)
+        $response = $this->actingAs($this->admin, 'super_admin')
             ->from('/admin/portfolios/create')
             ->post('/admin/portfolios', $payload);
 
@@ -417,7 +417,7 @@ class SkillsAndProjectsManagementTest extends TestCase
             ],
         ];
 
-        $response = $this->actingAs($this->admin)
+        $response = $this->actingAs($this->admin, 'super_admin')
             ->from('/admin/portfolios/create')
             ->post('/admin/portfolios', $payload);
 

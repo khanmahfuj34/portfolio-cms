@@ -109,6 +109,63 @@ class PortfolioDomainService
     }
 
     /**
+     * Synchronize the default subdomain hostname when a portfolio's slug is updated.
+     *
+     * @throws InvalidArgumentException|Throwable
+     */
+    public function syncDefaultSubdomain(Portfolio $portfolio, string $newSlug): PortfolioDomain
+    {
+        $hostname = $this->buildSubdomainHostname($newSlug);
+
+        try {
+            return DB::transaction(function () use ($portfolio, $hostname): PortfolioDomain {
+                Portfolio::whereKey($portfolio->id)->lockForUpdate()->firstOrFail();
+
+                $existingForHost = PortfolioDomain::where('domain', $hostname)->first();
+                if ($existingForHost && (int) $existingForHost->portfolio_id !== (int) $portfolio->id) {
+                    throw new InvalidArgumentException("Domain '{$hostname}' is already registered.");
+                }
+
+                $currentSubdomain = PortfolioDomain::where('portfolio_id', $portfolio->id)
+                    ->where('type', PortfolioDomain::TYPE_SUBDOMAIN)
+                    ->orderByDesc('is_primary')
+                    ->orderBy('id')
+                    ->first();
+
+                if ($currentSubdomain) {
+                    if ($currentSubdomain->domain !== $hostname) {
+                        $currentSubdomain->update([
+                            'domain' => $hostname,
+                            'is_verified' => true,
+                            'verified_at' => $currentSubdomain->verified_at ?? now(),
+                        ]);
+                    }
+
+                    return $currentSubdomain->refresh();
+                }
+
+                $hasPrimary = PortfolioDomain::where('portfolio_id', $portfolio->id)
+                    ->where('is_primary', true)
+                    ->exists();
+
+                return $portfolio->domains()->create([
+                    'domain' => $hostname,
+                    'type' => PortfolioDomain::TYPE_SUBDOMAIN,
+                    'is_primary' => ! $hasPrimary,
+                    'is_verified' => true,
+                    'verified_at' => now(),
+                ]);
+            });
+        } catch (QueryException $e) {
+            if ($this->isUniqueConstraintViolation($e)) {
+                throw new InvalidArgumentException("Domain '{$hostname}' is already registered.", 0, $e);
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
      * Attach a subdomain or custom domain to a Portfolio atomically.
      * Enforces duplicate rejection and transactional primary-domain uniqueness.
      *
@@ -242,6 +299,62 @@ class PortfolioDomainService
         }
 
         return "{$scheme}://{$domain->domain}{$portSuffix}";
+    }
+
+    /**
+     * Determine whether an incoming request host is a supported base host
+     * (configured base_domain or local loopback aliases during local/testing).
+     */
+    public function isBaseHost(string $rawHost): bool
+    {
+        $host = strtolower(trim($rawHost));
+        if (str_starts_with($host, '[')) {
+            $host = trim(explode(']', $host, 2)[0], '[');
+        } elseif (substr_count($host, ':') === 1) {
+            $host = explode(':', $host, 2)[0];
+        }
+        $host = rtrim($host, '.');
+
+        $baseDomain = $this->baseDomain();
+        if ($host === $baseDomain) {
+            return true;
+        }
+
+        if (in_array($baseDomain, ['localhost', '127.0.0.1'], true) && app()->environment(['local', 'testing'])) {
+            return in_array($host, ['localhost', '127.0.0.1', '::1'], true);
+        }
+
+        return false;
+    }
+
+    /**
+     * Format a full URL for a path on the base domain, preserving local host/port.
+     */
+    public function baseUrlFor(string $path = '/', ?Request $request = null): string
+    {
+        $normalizedPath = '/' . ltrim($path, '/');
+
+        if ($request && $this->isBaseHost($request->getHost())) {
+            $port = $request->getPort();
+            $scheme = $request->getScheme();
+            $portSuffix = ($port && ! (($scheme === 'http' && (int) $port === 80) || ($scheme === 'https' && (int) $port === 443)))
+                ? ':' . $port
+                : '';
+
+            return "{$scheme}://{$request->getHost()}{$portSuffix}{$normalizedPath}";
+        }
+
+        $scheme = $request?->getScheme()
+            ?? (parse_url((string) config('app.url'), PHP_URL_SCHEME) ?: 'http');
+
+        $port = $request?->getPort()
+            ?? parse_url((string) config('app.url'), PHP_URL_PORT);
+
+        $portSuffix = ($port && ! (($scheme === 'http' && (int) $port === 80) || ($scheme === 'https' && (int) $port === 443)))
+            ? ':' . $port
+            : '';
+
+        return "{$scheme}://{$this->baseDomain()}{$portSuffix}{$normalizedPath}";
     }
 
     /**

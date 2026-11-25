@@ -9,6 +9,7 @@ use App\Models\Portfolio;
 use App\Services\PortfolioNavItemService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class PortfolioNavItemController extends Controller
@@ -22,6 +23,8 @@ class PortfolioNavItemController extends Controller
      */
     public function index(Portfolio $portfolio): View
     {
+        Gate::authorize('view', $portfolio);
+
         $navItems = $this->navItemService->getAll($portfolio);
 
         return view('admin.portfolios.nav-items.index', compact(
@@ -37,6 +40,8 @@ class PortfolioNavItemController extends Controller
         StorePortfolioNavItemRequest $request,
         Portfolio $portfolio
     ): RedirectResponse {
+        Gate::authorize('update', $portfolio);
+
         $this->navItemService->create(
             $portfolio,
             $request->validated()
@@ -56,6 +61,8 @@ class PortfolioNavItemController extends Controller
         Portfolio $portfolio,
         int $navItem
     ): RedirectResponse {
+        Gate::authorize('update', $portfolio);
+
         $this->navItemService->update(
             $portfolio,
             $navItem,
@@ -75,6 +82,8 @@ class PortfolioNavItemController extends Controller
         Portfolio $portfolio,
         int $navItem
     ): RedirectResponse {
+        Gate::authorize('update', $portfolio);
+
         $this->navItemService->delete($portfolio, $navItem);
 
         return back()->with(
@@ -90,6 +99,8 @@ class PortfolioNavItemController extends Controller
         Request $request,
         Portfolio $portfolio
     ): RedirectResponse {
+        Gate::authorize('update', $portfolio);
+
         $validated = $request->validate([
             'items' => ['required', 'array', 'min:1'],
             'items.*' => ['required', 'integer', 'distinct'],
@@ -113,6 +124,8 @@ class PortfolioNavItemController extends Controller
         Portfolio $portfolio,
         int $navItem
     ): RedirectResponse {
+        Gate::authorize('update', $portfolio);
+
         $this->navItemService->toggleVisibility(
             $portfolio,
             $navItem

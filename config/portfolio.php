@@ -27,6 +27,7 @@ return [
         'www',
         'login',
         'logout',
+        'register',
         'dashboard',
         'profiles',
         'portfolios',

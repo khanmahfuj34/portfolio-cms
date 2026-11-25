@@ -26,6 +26,14 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public const ROLE_SUPER_ADMIN = 'super_admin';
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLES = [
+        self::ROLE_SUPER_ADMIN,
+        self::ROLE_ADMIN,
+    ];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -41,13 +49,37 @@ class User extends Authenticatable
     }
 
     /**
-     * Check whether the user is a Super Admin.
+     * Determine whether the user account is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active === true;
+    }
+
+    /**
+     * Determine whether the user has a given active role.
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role && $this->isActive();
+    }
+
+    /**
+     * Check whether the user is an active Super Admin.
      */
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'super_admin'
-            && $this->is_active === true;
+        return $this->hasRole(self::ROLE_SUPER_ADMIN);
     }
+
+    /**
+     * Check whether the user is an active Individual Admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->hasRole(self::ROLE_ADMIN);
+    }
+
     public function portfolios(): HasMany
     {
         return $this->hasMany(Portfolio::class);

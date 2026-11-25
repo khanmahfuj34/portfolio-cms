@@ -8,7 +8,9 @@ class StorePortfolioProjectRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isSuperAdmin() === true;
+        $portfolio = $this->route('portfolio');
+
+        return $portfolio !== null && $this->user()?->can('update', $portfolio) === true;
     }
 
     public function rules(): array
@@ -29,17 +31,18 @@ class StorePortfolioProjectRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:255',
+                'regex:/^(?:https?:\/\/|\/(?!\/))/i',
             ],
 
             'live_url' => [
                 'nullable',
-                'url',
+                'url:http,https',
                 'max:255',
             ],
 
             'github_url' => [
                 'nullable',
-                'url',
+                'url:http,https',
                 'max:255',
             ],
 

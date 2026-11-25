@@ -6,12 +6,23 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class SuperAdminLoginRequest extends FormRequest
 {
+    protected $redirectRoute = 'admin.login';
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->input('email'))) {
+            $this->merge([
+                'email' => strtolower(trim($this->input('email'))),
+            ]);
+        }
     }
 
     /**

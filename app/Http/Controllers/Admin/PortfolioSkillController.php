@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PortfolioSkillController extends Controller
 {
@@ -24,6 +25,8 @@ class PortfolioSkillController extends Controller
      */
     public function index(Request $request, Portfolio $portfolio): View|JsonResponse
     {
+        Gate::authorize('view', $portfolio);
+
         $skills = $this->skillService->getAll($portfolio);
 
         if ($request->wantsJson()) {
@@ -99,6 +102,8 @@ class PortfolioSkillController extends Controller
         Portfolio $portfolio,
         PortfolioSkill $skill
     ): RedirectResponse|JsonResponse {
+        Gate::authorize('update', $portfolio);
+
         $this->skillService->delete($portfolio, $skill);
 
         if ($request->wantsJson()) {

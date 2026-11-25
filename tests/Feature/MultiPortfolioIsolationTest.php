@@ -254,7 +254,7 @@ class MultiPortfolioIsolationTest extends TestCase
         $guestResponse->assertStatus(404);
 
         // Authenticated Super Admin can preview the draft portfolio
-        $adminResponse = $this->actingAs($this->admin)->get('/draft-preview-slug');
+        $adminResponse = $this->actingAs($this->admin, 'super_admin')->get('/draft-preview-slug');
         $adminResponse->assertStatus(200);
         $adminResponse->assertSee('Admin Preview Mode');
         $adminResponse->assertSee('Draft Preview Owner');
@@ -276,7 +276,7 @@ class MultiPortfolioIsolationTest extends TestCase
         $resGuest1->assertStatus(404);
 
         // 2. Super Admin toggles to Published
-        $toggleRes1 = $this->actingAs($this->admin)->patch(
+        $toggleRes1 = $this->actingAs($this->admin, 'super_admin')->patch(
             route('admin.portfolios.toggle-publish', $portfolio)
         );
         $toggleRes1->assertSessionHas('success');
@@ -290,7 +290,7 @@ class MultiPortfolioIsolationTest extends TestCase
         $resGuest2->assertStatus(200);
 
         // 4. Super Admin toggles back to Draft
-        $toggleRes2 = $this->actingAs($this->admin)->patch(
+        $toggleRes2 = $this->actingAs($this->admin, 'super_admin')->patch(
             route('admin.portfolios.toggle-publish', $portfolio)
         );
         $toggleRes2->assertSessionHas('success');
@@ -300,7 +300,7 @@ class MultiPortfolioIsolationTest extends TestCase
         $this->assertNull($portfolio->published_at);
 
         // 5. Public visitor (unauthenticated) gets 404 again
-        auth()->logout();
+        auth('super_admin')->logout();
         $resGuest3 = $this->get('/toggle-status-slug');
         $resGuest3->assertStatus(404);
     }
@@ -308,6 +308,6 @@ class MultiPortfolioIsolationTest extends TestCase
     public function test_unknown_slugs_return_404_for_both_guest_and_admin(): void
     {
         $this->get('/unknown-portfolio-xyz-987')->assertStatus(404);
-        $this->actingAs($this->admin)->get('/unknown-portfolio-xyz-987')->assertStatus(404);
+        $this->actingAs($this->admin, 'super_admin')->get('/unknown-portfolio-xyz-987')->assertStatus(404);
     }
 }

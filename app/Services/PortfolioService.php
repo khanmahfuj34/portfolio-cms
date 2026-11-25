@@ -11,7 +11,8 @@ use Throwable;
 class PortfolioService
 {
     public function __construct(
-        private readonly PortfolioDomainService $domainService
+        private readonly PortfolioDomainService $domainService,
+        private readonly ?PortfolioPreviewService $previewService = null
     ) {}
 
     /**
@@ -94,6 +95,51 @@ class PortfolioService
 
             return $portfolio;
         });
+    }
+
+    /**
+     * Atomically update a Portfolio, its Profile, and sync its default subdomain if slug changed.
+     *
+     * @throws InvalidArgumentException|Throwable
+     */
+    public function update(
+        Portfolio $portfolio,
+        array $portfolioData,
+        array $profileData
+    ): Portfolio {
+        unset($portfolioData['user_id'], $portfolioData['status'], $portfolioData['published_at']);
+
+        return DB::transaction(function () use ($portfolio, $portfolioData, $profileData): Portfolio {
+            $slugChanged = array_key_exists('slug', $portfolioData)
+                && $portfolioData['slug'] !== $portfolio->slug;
+
+            $portfolio->update($portfolioData);
+
+            $portfolio->profile()->updateOrCreate(
+                ['portfolio_id' => $portfolio->id],
+                $profileData
+            );
+
+            if ($slugChanged) {
+                $this->domainService->syncDefaultSubdomain($portfolio, $portfolio->slug);
+            }
+
+            return $portfolio->refresh();
+        });
+    }
+
+    /**
+     * Atomically delete a Portfolio (related records cascade via database foreign keys).
+     *
+     * @throws Throwable
+     */
+    public function delete(Portfolio $portfolio): void
+    {
+        DB::transaction(function () use ($portfolio): void {
+            $portfolio->delete();
+        });
+
+        $this->previewService()->revokeAllForPortfolio($portfolio);
     }
 
     /**
@@ -228,7 +274,7 @@ class PortfolioService
             throw new InvalidArgumentException("Portfolio '{$portfolio->name}' is already a draft.");
         }
 
-        return DB::transaction(function () use ($portfolio) {
+        $updated = DB::transaction(function () use ($portfolio) {
             $portfolio->update([
                 'status' => 'draft',
                 'published_at' => null,
@@ -236,6 +282,15 @@ class PortfolioService
 
             return $portfolio;
         });
+
+        $this->previewService()->revokeAllForPortfolio($updated);
+
+        return $updated;
+    }
+
+    private function previewService(): PortfolioPreviewService
+    {
+        return $this->previewService ?? app(PortfolioPreviewService::class);
     }
 
     /**

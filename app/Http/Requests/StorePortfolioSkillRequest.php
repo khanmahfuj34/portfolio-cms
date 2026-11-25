@@ -9,7 +9,9 @@ class StorePortfolioSkillRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isSuperAdmin() === true;
+        $portfolio = $this->route('portfolio');
+
+        return $portfolio !== null && $this->user()?->can('update', $portfolio) === true;
     }
 
     public function rules(): array

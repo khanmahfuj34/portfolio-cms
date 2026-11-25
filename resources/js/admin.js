@@ -39,8 +39,20 @@ export function initModalManager() {
     });
 }
 
+export function initConfirmForms() {
+    document.addEventListener('submit', (e) => {
+        const form = e.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        const message = form.getAttribute('data-confirm');
+        if (message && !window.confirm(message)) {
+            e.preventDefault();
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initModalManager();
+    initConfirmForms();
     initSlugGenerator();
     initNavbarManager();
     initSkillsManager();
