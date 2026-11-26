@@ -17,18 +17,20 @@ class EnsureSuperAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (RejectDualAuthSessions::hasPersistedDualGuards($request)) {
+            return RejectDualAuthSessions::failClosed($request);
+        }
+
         $user = $request->user('super_admin');
 
         if ($user instanceof User && ! $user->isActive()) {
             Auth::guard('super_admin')->logout();
+            Auth::guard('admin')->logout();
+            Auth::guard('web')->logout();
+
             if ($request->hasSession()) {
-                if (Auth::guard('admin')->check()) {
-                    $request->session()->regenerate(true);
-                    $request->session()->regenerateToken();
-                } else {
-                    $request->session()->invalidate();
-                    $request->session()->regenerateToken();
-                }
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
             }
 
             abort(403, 'Unauthorized access.');
@@ -38,6 +40,10 @@ class EnsureSuperAdmin
             abort(403, 'Unauthorized access.');
         }
 
-        return $next($request);
+        $response = $next($request);
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        $response->headers->set('Pragma', 'no-cache');
+
+        return $response;
     }
 }

@@ -133,7 +133,7 @@ class ExampleTest extends TestCase
             ->assertRedirect('http://127.0.0.1/login');
     }
 
-    public function test_guard_sessions_never_authenticate_other_portal_and_dual_guards_render_portal_choice(): void
+    public function test_guard_sessions_never_authenticate_other_portal_and_dual_guards_fail_closed(): void
     {
         $superAdmin = User::factory()->create([
             'role' => User::ROLE_SUPER_ADMIN,
@@ -156,17 +156,15 @@ class ExampleTest extends TestCase
             ->get('http://localhost/admin/dashboard')
             ->assertRedirect('http://localhost/admin/login');
 
-        // Both guards simultaneously authenticated on "/" -> explicit portal selection page (200 OK)
+        // Both guards simultaneously authenticated on "/" -> fail-closed recovery to guest landing page
         $response = $this->actingAs($superAdmin, 'super_admin')
             ->actingAs($individualAdmin, 'admin')
             ->get('http://localhost/');
 
-        $response->assertOk();
-        $response->assertSee('Choose a portal to continue');
-        $response->assertSee('/admin/dashboard', false);
-        $response->assertSee('/dashboard', false);
-        $this->assertAuthenticatedAs($superAdmin, 'super_admin');
-        $this->assertAuthenticatedAs($individualAdmin, 'admin');
+        $response->assertRedirect('http://localhost')
+            ->assertSessionHas('status', 'Your session was reset for security reasons. Please sign in again.');
+        $this->assertGuest('super_admin');
+        $this->assertGuest('admin');
     }
 
     public function test_existing_auth_and_registration_routes_work_on_both_localhost_and_127_0_0_1(): void

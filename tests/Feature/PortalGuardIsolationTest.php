@@ -82,14 +82,14 @@ class PortalGuardIsolationTest extends TestCase
         $this->assertGuest('admin');
         $this->assertAuthenticatedAs($this->superAdmin, 'super_admin');
 
-        // Submitting valid Individual Admin credentials logs into 'admin' guard and redirects to /dashboard
+        // Submitting valid Individual Admin credentials logs out previous Super Admin session and logs into 'admin' guard
         $this->post('http://localhost/login', [
             'email' => $this->individualAdmin->email,
             'password' => 'AdminPass123!',
         ])->assertRedirect('http://localhost/dashboard');
 
         $this->assertAuthenticatedAs($this->individualAdmin, 'admin');
-        $this->assertAuthenticatedAs($this->superAdmin, 'super_admin');
+        $this->assertGuest('super_admin');
     }
 
     public function test_authenticated_individual_admin_can_view_and_post_to_super_admin_login_page(): void
@@ -125,14 +125,14 @@ class PortalGuardIsolationTest extends TestCase
 
         $this->assertGuest('super_admin');
 
-        // POST /admin/login with valid Super Admin credentials succeeds on 'super_admin' guard
+        // POST /admin/login with valid Super Admin credentials replaces 'admin' guard cleanly
         $this->post('http://localhost/admin/login', [
             'email' => $this->superAdmin->email,
             'password' => 'SuperPass123!',
         ])->assertRedirect('http://localhost/admin/dashboard');
 
         $this->assertAuthenticatedAs($this->superAdmin, 'super_admin');
-        $this->assertAuthenticatedAs($this->individualAdmin, 'admin');
+        $this->assertGuest('admin');
     }
 
     public function test_failed_login_never_redirects_to_another_roles_dashboard(): void
@@ -163,56 +163,50 @@ class PortalGuardIsolationTest extends TestCase
             ->assertSessionHasErrors(['email']);
     }
 
-    public function test_portals_operate_independently_and_logout_from_one_preserves_the_other(): void
+    public function test_portals_enforce_single_active_session_and_logout_invalidates_session(): void
     {
-        // Log into both portals independently
+        // Log in as Super Admin -> only super_admin active
         $this->post('http://localhost/admin/login', [
             'email' => $this->superAdmin->email,
             'password' => 'SuperPass123!',
         ])->assertRedirect('http://localhost/admin/dashboard');
 
+        $this->assertAuthenticatedAs($this->superAdmin, 'super_admin');
+        $this->assertGuest('admin');
+
+        // Log in as Individual Admin in same browser -> replaces Super Admin session
         $this->post('http://localhost/login', [
             'email' => $this->individualAdmin->email,
             'password' => 'AdminPass123!',
         ])->assertRedirect('http://localhost/dashboard');
 
-        // Both dashboards work concurrently and render their own identities
-        $this->get('http://localhost/admin/dashboard')
-            ->assertOk()
-            ->assertSee('Root Super Admin');
+        $this->assertAuthenticatedAs($this->individualAdmin, 'admin');
+        $this->assertGuest('super_admin');
+        $this->get('http://localhost/dashboard')->assertOk()->assertSee('Welcome, Individual Creator');
+        $this->get('http://localhost/admin/dashboard')->assertRedirect('http://localhost/admin/login');
 
-        $this->get('http://localhost/dashboard')
-            ->assertOk()
-            ->assertSee('Welcome, Individual Creator');
-
-        // Logging out of Individual Admin portal preserves Super Admin session
+        // Logout invalidates the current session completely
         $this->post('http://localhost/logout')
             ->assertRedirect('http://localhost/login');
 
         $this->assertGuest('admin');
-        $this->assertAuthenticatedAs($this->superAdmin, 'super_admin');
-        $this->get('http://localhost/admin/dashboard')->assertOk();
+        $this->assertGuest('super_admin');
         $this->get('http://localhost/dashboard')->assertRedirect('http://localhost/login');
 
-        // Re-login Individual Admin, then log out Super Admin portal -> Individual Admin stays logged in
-        $this->post('http://localhost/login', [
-            'email' => $this->individualAdmin->email,
-            'password' => 'AdminPass123!',
-        ])->assertRedirect('http://localhost/dashboard');
+        // Log in as Super Admin -> active only on super_admin, logout invalidates session completely
+        $this->post('http://localhost/admin/login', [
+            'email' => $this->superAdmin->email,
+            'password' => 'SuperPass123!',
+        ])->assertRedirect('http://localhost/admin/dashboard');
+
+        $this->get('http://localhost/admin/dashboard')->assertOk()->assertSee('Root Super Admin');
+        $this->get('http://localhost/dashboard')->assertRedirect('http://localhost/login');
 
         $this->post('http://localhost/admin/logout')
             ->assertRedirect('http://localhost/admin/login');
 
-        $this->assertGuest('super_admin');
-        $this->assertAuthenticatedAs($this->individualAdmin, 'admin');
-        $this->get('http://localhost/dashboard')->assertOk();
-        $this->get('http://localhost/admin/dashboard')->assertRedirect('http://localhost/admin/login');
-
-        // Final logout invalidates remaining session completely
-        $this->post('http://localhost/logout')
-            ->assertRedirect('http://localhost/login');
-
         $this->assertGuest('admin');
         $this->assertGuest('super_admin');
+        $this->get('http://localhost/admin/dashboard')->assertRedirect('http://localhost/admin/login');
     }
 }

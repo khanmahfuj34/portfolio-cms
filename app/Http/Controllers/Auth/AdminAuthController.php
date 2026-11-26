@@ -34,7 +34,7 @@ class AdminAuthController extends Controller
     }
 
     /**
-     * Handle Individual Admin self-registration.
+     * Handle Individual Admin self-registration under strict single active session policy.
      */
     public function register(AdminRegisterRequest $request): RedirectResponse
     {
@@ -42,8 +42,13 @@ class AdminAuthController extends Controller
             $request->safe()->only(['name', 'email', 'password'])
         );
 
+        Auth::guard('super_admin')->logout();
+        Auth::guard('web')->logout();
+        $request->session()->forget('url.intended');
+
         Auth::guard('admin')->login($user);
-        $request->session()->regenerate();
+        $request->session()->regenerate(true);
+        $request->session()->regenerateToken();
 
         return redirect($this->dashboardPath());
     }
@@ -76,15 +81,37 @@ class AdminAuthController extends Controller
         }
 
         $validated = $request->validated();
-
-        $authenticated = Auth::guard('admin')->attempt([
+        $credentials = [
             'email' => $validated['email'],
             'password' => $validated['password'],
             'role' => User::ROLE_ADMIN,
             'is_active' => true,
-        ], $request->boolean('remember'));
+        ];
 
-        if (! $authenticated) {
+        if (! Auth::guard('admin')->validate($credentials)) {
+            RateLimiter::hit($throttleKey, 60);
+
+            return redirect()
+                ->route('login')
+                ->withErrors([
+                    'email' => 'Invalid email or password.',
+                ])
+                ->onlyInput('email');
+        }
+
+        // Enforce single active authentication guard per browser session.
+        Auth::guard('super_admin')->logout();
+        Auth::guard('web')->logout();
+
+        $intended = (string) $request->session()->get('url.intended', '');
+        $intendedHost = parse_url($intended, PHP_URL_HOST);
+        $intendedPath = parse_url($intended, PHP_URL_PATH) ?: '';
+        $isSafeIntendedHost = ! is_string($intendedHost) || $intendedHost === '' || app(\App\Services\PortfolioDomainService::class)->isBaseHost($intendedHost);
+        if (! $isSafeIntendedHost || ! preg_match('#^/dashboard(?:/.*)?$#', $intendedPath)) {
+            $request->session()->forget('url.intended');
+        }
+
+        if (! Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
             RateLimiter::hit($throttleKey, 60);
 
             return redirect()
@@ -96,22 +123,22 @@ class AdminAuthController extends Controller
         }
 
         RateLimiter::clear($throttleKey);
-        $request->session()->regenerate();
+        $request->session()->regenerate(true);
+        $request->session()->regenerateToken();
 
         return redirect()->intended($this->dashboardPath());
     }
 
     /**
-     * Handle Individual Admin logout without disturbing an independent Super Admin session.
+     * Handle Individual Admin logout and invalidate the current browser session.
      */
     public function logout(Request $request): RedirectResponse
     {
         Auth::guard('admin')->logout();
+        Auth::guard('super_admin')->logout();
+        Auth::guard('web')->logout();
 
-        if (Auth::guard('super_admin')->check()) {
-            $request->session()->regenerate(true);
-            $request->session()->regenerateToken();
-        } else {
+        if ($request->hasSession()) {
             $request->session()->invalidate();
             $request->session()->regenerateToken();
         }

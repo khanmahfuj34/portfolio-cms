@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureBaseDomain;
 use App\Http\Middleware\EnsureIndividualAdmin;
 use App\Http\Middleware\EnsureSuperAdmin;
+use App\Http\Middleware\RejectDualAuthSessions;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests;
 use Illuminate\Foundation\Application;
@@ -28,14 +29,17 @@ return Application::configure(basePath: dirname(__DIR__))
                 return Route::has('login') ? route('login') : '/login';
             },
             users: function (Request $request): string {
-                if ($request->is('admin', 'admin/*')) {
-                    $superAdmin = Auth::guard('super_admin')->user();
-                    if ($superAdmin instanceof User && $superAdmin->isSuperAdmin()) {
-                        return '/admin/dashboard';
-                    }
+                $superAdmin = Auth::guard('super_admin')->user();
+                $admin = Auth::guard('admin')->user();
+
+                if ($superAdmin instanceof User && $admin instanceof User) {
+                    return '/';
                 }
 
-                $admin = Auth::guard('admin')->user();
+                if ($request->is('admin', 'admin/*') && $superAdmin instanceof User && $superAdmin->isSuperAdmin()) {
+                    return '/admin/dashboard';
+                }
+
                 if ($admin instanceof User && $admin->isAdmin()) {
                     return Route::has('dashboard.index') ? route('dashboard.index') : '/dashboard';
                 }
@@ -44,12 +48,17 @@ return Application::configure(basePath: dirname(__DIR__))
             },
         );
 
+        $middleware->web(append: [
+            RejectDualAuthSessions::class,
+        ]);
+
         $middleware->alias([
             'base.domain' => EnsureBaseDomain::class,
             'super.admin' => EnsureSuperAdmin::class,
             'individual.admin' => EnsureIndividualAdmin::class,
         ]);
 
+        $middleware->prependToPriorityList(AuthenticatesRequests::class, RejectDualAuthSessions::class);
         $middleware->prependToPriorityList(AuthenticatesRequests::class, EnsureBaseDomain::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

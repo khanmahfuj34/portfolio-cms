@@ -355,4 +355,5 @@ Route::middleware('base.domain')->group(function () {
             ->name('portfolio.show')
             ->where('slug', '^[a-z0-9]+(?:-[a-z0-9]+)*$');
     }
+
 });

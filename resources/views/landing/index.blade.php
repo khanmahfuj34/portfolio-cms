@@ -33,6 +33,15 @@
     <div class="landing">
         @include('landing.partials.navbar')
 
+        @if (session('status'))
+            <div class="l-container" style="padding-top: 5.5rem; margin-bottom: -3.5rem; position: relative; z-index: 30;">
+                <div role="status" style="background: rgba(197, 160, 89, 0.14); border: 1px solid rgba(197, 160, 89, 0.4); color: #f4f4ff; border-radius: 12px; padding: 0.875rem 1.25rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 0.9rem;">
+                    <span>{{ session('status') }}</span>
+                    <a href="{{ route('login') }}" style="color: #e6c687; text-decoration: underline; font-weight: 500;">Sign in</a>
+                </div>
+            </div>
+        @endif
+
         <main id="main">
             @include('landing.partials.hero')
             @include('landing.partials.portfolio-showcase')

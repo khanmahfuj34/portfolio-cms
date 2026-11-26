@@ -49,6 +49,29 @@ class SuperAdminAuthController extends Controller
         $credentials['role'] = User::ROLE_SUPER_ADMIN;
         $credentials['is_active'] = true;
 
+        if (! Auth::guard('super_admin')->validate($credentials)) {
+            RateLimiter::hit($throttleKey, 60);
+
+            return redirect()
+                ->route('admin.login')
+                ->withErrors([
+                    'email' => 'Invalid email or password.',
+                ])
+                ->onlyInput('email');
+        }
+
+        // Enforce single active authentication guard per browser session.
+        Auth::guard('admin')->logout();
+        Auth::guard('web')->logout();
+
+        $intended = (string) $request->session()->get('url.intended', '');
+        $intendedHost = parse_url($intended, PHP_URL_HOST);
+        $intendedPath = parse_url($intended, PHP_URL_PATH) ?: '';
+        $isSafeIntendedHost = ! is_string($intendedHost) || $intendedHost === '' || app(\App\Services\PortfolioDomainService::class)->isBaseHost($intendedHost);
+        if (! $isSafeIntendedHost || ! preg_match('#^/admin/(?:dashboard|users|themes|portfolios|profiles)(?:/.*)?$#', $intendedPath)) {
+            $request->session()->forget('url.intended');
+        }
+
         if (! Auth::guard('super_admin')->attempt($credentials)) {
             RateLimiter::hit($throttleKey, 60);
 
@@ -61,7 +84,8 @@ class SuperAdminAuthController extends Controller
         }
 
         RateLimiter::clear($throttleKey);
-        $request->session()->regenerate();
+        $request->session()->regenerate(true);
+        $request->session()->regenerateToken();
 
         return redirect()->intended(
             route('admin.dashboard')
@@ -69,16 +93,15 @@ class SuperAdminAuthController extends Controller
     }
 
     /**
-     * Handle Super Admin logout without disturbing an independent Individual Admin session.
+     * Handle Super Admin logout and invalidate the current browser session.
      */
     public function logout(Request $request): RedirectResponse
     {
         Auth::guard('super_admin')->logout();
+        Auth::guard('admin')->logout();
+        Auth::guard('web')->logout();
 
-        if (Auth::guard('admin')->check()) {
-            $request->session()->regenerate(true);
-            $request->session()->regenerateToken();
-        } else {
+        if ($request->hasSession()) {
             $request->session()->invalidate();
             $request->session()->regenerateToken();
         }

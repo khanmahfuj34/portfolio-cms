@@ -18,6 +18,10 @@ class EnsureIndividualAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (RejectDualAuthSessions::hasPersistedDualGuards($request)) {
+            return RejectDualAuthSessions::failClosed($request);
+        }
+
         $user = $request->user('admin');
 
         if (! $user instanceof User) {
@@ -30,14 +34,12 @@ class EnsureIndividualAdmin
 
         if (! $user->isActive()) {
             Auth::guard('admin')->logout();
+            Auth::guard('super_admin')->logout();
+            Auth::guard('web')->logout();
+
             if ($request->hasSession()) {
-                if (Auth::guard('super_admin')->check()) {
-                    $request->session()->regenerate(true);
-                    $request->session()->regenerateToken();
-                } else {
-                    $request->session()->invalidate();
-                    $request->session()->regenerateToken();
-                }
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
             }
 
             if ($request->expectsJson()) {
@@ -55,6 +57,10 @@ class EnsureIndividualAdmin
             abort(403, 'Unauthorized access.');
         }
 
-        return $next($request);
+        $response = $next($request);
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        $response->headers->set('Pragma', 'no-cache');
+
+        return $response;
     }
 }
