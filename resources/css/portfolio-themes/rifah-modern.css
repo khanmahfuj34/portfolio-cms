@@ -1,0 +1,168 @@
+@import 'tailwindcss';
+
+@source '../../views/portfolio-themes/rifah-modern/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-ink: rgb(var(--color-ink-rgb) / <alpha-value>);
+    --color-paper: rgb(var(--color-paper-rgb) / <alpha-value>);
+    --color-surface: rgb(var(--color-surface-rgb) / <alpha-value>);
+    --color-muted: rgb(var(--color-muted-rgb) / <alpha-value>);
+    --color-accent: #C2542D;
+    --color-accent2: #C79A45;
+
+    --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+:root {
+    --color-paper-rgb: 247 241 232;
+    --color-ink-rgb: 42 31 26;
+    --color-surface-rgb: 255 253 250;
+    --color-muted-rgb: 138 123 110;
+    --rm-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.dark {
+    --color-paper-rgb: 26 19 16;
+    --color-ink-rgb: 241 232 224;
+    --color-surface-rgb: 42 33 28;
+    --color-muted-rgb: 168 150 138;
+}
+
+html.rm-theme-root {
+    scroll-behavior: smooth;
+    font-size: 18px;
+}
+
+@media (min-width: 1024px) {
+    html.rm-theme-root {
+        font-size: 19px;
+    }
+}
+
+.rm-body {
+    background-color: rgb(var(--color-paper-rgb));
+    color: rgb(var(--color-ink-rgb));
+    font-family: var(--font-body);
+    background-image: radial-gradient(rgb(var(--color-ink-rgb) / 0.065) 1px, transparent 1px);
+    background-size: 24px 24px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.rm-body ::selection {
+    background-color: rgba(194, 84, 45, 0.22);
+}
+
+.rm-section-alt {
+    background-color: rgb(var(--color-surface-rgb));
+    position: relative;
+}
+
+.rm-blob {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(80px);
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.rm-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2.5px;
+    width: 100%;
+    z-index: 60;
+    transform-origin: left center;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, #C2542D, #C79A45);
+    pointer-events: none;
+}
+
+.rm-nav-link {
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.rm-nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 2px;
+    border-radius: 9999px;
+    background-color: #C2542D;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.25s var(--rm-ease);
+}
+
+.rm-nav-link.is-active {
+    color: #C2542D;
+}
+
+.rm-nav-link.is-active::after {
+    transform: scaleX(1);
+}
+
+.rm-reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.55s var(--rm-ease), transform 0.55s var(--rm-ease);
+    transition-delay: var(--rm-delay, 0ms);
+}
+
+.rm-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.rm-skill-chip {
+    transition: transform 0.22s var(--rm-ease), box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.rm-skill-chip:hover {
+    transform: translateY(-2px) scale(1.05);
+}
+
+.rm-project-card {
+    transition: transform 0.28s var(--rm-ease), box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.rm-project-card:hover {
+    transform: translateY(-6px);
+}
+
+.rm-filter-btn {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.rm-filter-btn.is-active {
+    background-color: #C2542D;
+    border-color: #C2542D;
+    color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.rm-theme-root {
+        scroll-behavior: auto;
+    }
+
+    .rm-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    .rm-project-card,
+    .rm-skill-chip,
+    .rm-nav-link::after,
+    .rm-progress-bar {
+        transition: none !important;
+        transform: none !important;
+    }
+}

@@ -5,12 +5,14 @@ use App\Http\Controllers\Admin\PortfolioController;
 use App\Http\Controllers\Admin\PortfolioNavItemController;
 use App\Http\Controllers\Admin\PortfolioProjectController;
 use App\Http\Controllers\Admin\PortfolioSkillController;
+use App\Http\Controllers\Admin\ThemeController as AdminThemeController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Auth\SuperAdminAuthController;
 use App\Http\Controllers\Dashboard\AccountDashboardController;
 use App\Http\Controllers\PublicPortfolioController;
 use App\Http\Controllers\RootController;
+use App\Http\Controllers\SuperAdmin\ThemeController as SuperAdminThemeController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -82,6 +84,16 @@ Route::middleware('base.domain')->group(function () {
             Route::put('/account/password', [AccountDashboardController::class, 'updatePassword'])
                 ->name('account.password');
 
+            // Published Theme Catalog (Individual Admin)
+            Route::prefix('themes')
+                ->name('themes.')
+                ->controller(AdminThemeController::class)
+                ->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('/{theme}', 'show')->whereNumber('theme')->name('show');
+                    Route::get('/{theme}/preview', 'preview')->whereNumber('theme')->name('preview');
+                });
+
             Route::get('/portfolios', [AccountDashboardController::class, 'portfolios'])
                 ->name('portfolios.index');
 
@@ -118,6 +130,11 @@ Route::middleware('base.domain')->group(function () {
             Route::patch('/portfolios/{portfolio}/unpublish', [AccountDashboardController::class, 'unpublish'])
                 ->name('portfolios.unpublish')
                 ->whereNumber('portfolio');
+
+            Route::patch('/portfolios/{portfolio}/themes/{theme}/apply', [AdminThemeController::class, 'apply'])
+                ->whereNumber('portfolio')
+                ->whereNumber('theme')
+                ->name('portfolios.themes.apply');
 
             // Reused Nested Portfolio Resources (PortfolioPolicy + scopeBindings enforced)
             Route::scopeBindings()->group(function () {
@@ -218,6 +235,23 @@ Route::middleware('base.domain')->group(function () {
             Route::patch('/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
                 ->name('users.toggle-status')
                 ->whereNumber('user');
+
+            // Theme Catalog Management
+            Route::prefix('themes')
+                ->name('themes.')
+                ->controller(SuperAdminThemeController::class)
+                ->group(function () {
+                    Route::get('/', 'index')->name('index');
+                    Route::post('/', 'store')->name('store');
+                    Route::get('/{theme}', 'show')->whereNumber('theme')->name('show');
+                    Route::get('/{theme}/preview', 'preview')->whereNumber('theme')->name('preview');
+                    Route::match(['put', 'patch'], '/{theme}', 'update')->whereNumber('theme')->name('update');
+                    Route::delete('/{theme}', 'destroy')->whereNumber('theme')->name('destroy');
+                    Route::patch('/{theme}/publish', 'publish')->whereNumber('theme')->name('publish');
+                    Route::patch('/{theme}/unpublish', 'unpublish')->whereNumber('theme')->name('unpublish');
+                    Route::patch('/{theme}/archive', 'archive')->whereNumber('theme')->name('archive');
+                    Route::patch('/{theme}/restore', 'restore')->whereNumber('theme')->name('restore');
+                });
 
             // Profiles & Portfolios Management
             Route::get('/profiles', [PortfolioController::class, 'index'])

@@ -10,6 +10,8 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/landing.css',
                 'resources/js/landing.js',
+                'resources/css/portfolio-themes/rifah-modern.css',
+                'resources/js/portfolio-themes/rifah-modern.js',
             ],
             refresh: true,
         }),

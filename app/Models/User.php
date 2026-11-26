@@ -84,4 +84,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Portfolio::class);
     }
+
+    public function createdThemes(): HasMany
+    {
+        return $this->hasMany(Theme::class, 'created_by');
+    }
 }

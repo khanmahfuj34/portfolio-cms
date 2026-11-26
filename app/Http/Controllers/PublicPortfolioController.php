@@ -6,6 +6,7 @@ use App\Models\Portfolio;
 use App\Models\User;
 use App\Services\PortfolioDomainService;
 use App\Services\PortfolioPreviewService;
+use App\Services\PortfolioThemeResolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,7 +16,8 @@ class PublicPortfolioController extends Controller
 {
     public function __construct(
         private readonly PortfolioDomainService $domainService,
-        private readonly PortfolioPreviewService $previewService
+        private readonly PortfolioPreviewService $previewService,
+        private readonly PortfolioThemeResolver $themeResolver
     ) {}
 
     /**
@@ -77,6 +79,7 @@ class PublicPortfolioController extends Controller
     {
         return Portfolio::query()
             ->with([
+                'theme',
                 'profile',
                 'navItems' => fn ($q) => $q->where('is_visible', true)->orderBy('sort_order', 'asc'),
                 'skills'   => fn ($q) => $q->orderBy('id', 'asc'),
@@ -97,32 +100,31 @@ class PublicPortfolioController extends Controller
             && $portfolio->published_at <= now();
 
         if ($isPublished) {
-            return response()->view('portfolio.show', [
-                'portfolio' => $portfolio,
-                'profile'   => $portfolio->profile,
-                'navItems'  => $portfolio->navItems,
-                'skills'    => $portfolio->skills,
-                'projects'  => $portfolio->projects,
-                'isPreview' => false,
-            ]);
+            return $this->renderPortfolio($portfolio, isPreview: false);
         }
 
         if (! $this->canPreviewDraft($request, $portfolio)) {
             abort(404);
         }
 
-        return response()
-            ->view('portfolio.show', [
-                'portfolio' => $portfolio,
-                'profile'   => $portfolio->profile,
-                'navItems'  => $portfolio->navItems,
-                'skills'    => $portfolio->skills,
-                'projects'  => $portfolio->projects,
-                'isPreview' => true,
-            ])
+        return $this->renderPortfolio($portfolio, isPreview: true)
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, private')
             ->header('Referrer-Policy', 'no-referrer')
             ->header('X-Robots-Tag', 'noindex, nofollow');
+    }
+
+    private function renderPortfolio(Portfolio $portfolio, bool $isPreview): Response
+    {
+        $view = $this->themeResolver->resolveView($portfolio);
+
+        return response()->view($view, [
+            'portfolio' => $portfolio,
+            'profile'   => $portfolio->profile,
+            'navItems'  => $portfolio->navItems,
+            'skills'    => $portfolio->skills,
+            'projects'  => $portfolio->projects,
+            'isPreview' => $isPreview,
+        ]);
     }
 
     private function canPreviewDraft(Request $request, Portfolio $portfolio): bool

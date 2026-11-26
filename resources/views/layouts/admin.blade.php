@@ -162,7 +162,7 @@
                         </x-admin.nav-link>
 
                         <!-- 3. Themes -->
-                        <x-admin.nav-link href="#themes" title="Themes" class="sidebar-link-item">
+                        <x-admin.nav-link :href="route('admin.themes.index')" :active="request()->routeIs('admin.themes.*')" title="Themes" class="sidebar-link-item">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4 5 5 0 015-5h1a1 1 0 011 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 011-1h1a5 5 0 015 5 4 4 0 01-4 4H7zM16 3.13a4 4 0 010 7.75"/>
                             </svg>
@@ -206,6 +206,12 @@
                         <x-admin.nav-link :href="route('dashboard.portfolios.index')" :active="request()->routeIs('dashboard.portfolios.*')" title="My Portfolios" class="sidebar-link-item">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </x-admin.nav-link>
+
+                        <x-admin.nav-link :href="route('dashboard.themes.index')" :active="request()->routeIs('dashboard.themes.*')" title="Themes" class="sidebar-link-item">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4 5 5 0 015-5h1a1 1 0 011 1v1a1 1 0 001 1h1a1 1 0 001-1v-1a1 1 0 011-1h1a5 5 0 015 5 4 4 0 01-4 4H7zM16 3.13a4 4 0 010 7.75"/>
                             </svg>
                         </x-admin.nav-link>
 
